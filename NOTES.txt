@@ -1,0 +1,24 @@
+
+
+If this project is made modular, it will be easier to work on now and take code
+from if we ever do something similar in the future. For this reason I propose we
+set the architecture as following.
+
+-- phunt.c --
+This has the main() function. Initializing all variables and running the event
+loop is done here.
+initialize_variables
+while(1)
+    item = parse_next_blacklistentry()
+    handle(item)
+
+
+-- config.c --
+This will be able to do all of the parsing for stuff.
+
+
+-- 
+
+
+-- log.c --
+This will hold all of the functions needed to gracefully print to the log.
