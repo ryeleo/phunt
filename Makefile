@@ -6,10 +6,13 @@ DEBUG		= -g -DDEBUG
 
 default: phunt
 
+test:
+	$(CC) test_log.c log.c $(CFLAGS) -g -DDEBUG -o $(PROJECTDIR)/test_log
+
 debug: CFLAGS += $(DEBUG)
 debug: default
 
-uoenc: phunt.c
+phunt: phunt.c
 	$(CC) phunt.c $(CFLAGS) -o $(PROJECTDIR)/phunt
 
 clean:
