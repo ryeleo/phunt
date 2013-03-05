@@ -1,3 +1,4 @@
+// 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
 #include "log.h"
 #include <stdio.h>
 #include <time.h>

@@ -1,5 +1,3 @@
-
-
 If this project is made modular, it will be easier to work on now and take code
 from if we ever do something similar in the future. For this reason I propose we
 set the architecture as following.
@@ -7,17 +5,17 @@ set the architecture as following.
 -- phunt.c --
 This has the main() function. Initializing all variables and running the event
 loop is done here.
-initialize_variables
-while(1)
-    item = parse_next_blacklistentry()
-    handle(item)
+while()
 
 
--- config.c --
-This will be able to do all of the parsing for stuff.
+-- action.c --
+This will define a struct that represents an action, and there will be functions 
+in here that allow the handling of actions as well.
 
 
--- 
+-- actionlist.c --
+This will be able to parse configuration and hold a list of all future actions
+to be taken. We will be easily able to extract an action from this struct/file
 
 
 -- log.c --

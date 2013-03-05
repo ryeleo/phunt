@@ -1,4 +1,5 @@
-/* 
+/* 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
+
 Log.c provides an implementation of a logging method to files. Typical
 usage for this program would be to log behaviour of a process. This supports
 logging messages of the following form.
