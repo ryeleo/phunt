@@ -13,6 +13,8 @@ The actions that can be taken on the above stated items are:
 -kill
 */
 
+#define MAX_STRLEN_FILENAME 256
+
 // Defines the types of actions that can be taken
 typedef action_t short;
 #define at_kill 0
@@ -25,13 +27,13 @@ typedef param_t short;
 #define pt_path 1
 #define pt_mem  2
 
-
 struct Action{
-    action_t type;
+    action_t actionType;
+    param_t paramType;
     union{
         char *pathName;
         int uid;
-        int memoryCap;
+        int memoryCap; // in kiloBytes
     }; //parameter passed
 }
 
@@ -50,6 +52,13 @@ int initAction(action_t at, param_t pt, void *param, struct Action *action);
 
 
 /*
+Description: Given an action, enforce that action.
+Note: We have to keep this method as low overhead as possible. This should also 
+be reflected in any methods that takeAction calls.
+
+Additionally, to 
+enforce that we never reach an accidental infinite loop, get a snapshot of the 
+/proc/ filesystem
 takeAction will be very regularly called so assuring that there is greatest
 efficiancy here is of interest. This function will have to look at the /proc
 filesystem every time it runs.
