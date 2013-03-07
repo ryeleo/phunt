@@ -17,5 +17,5 @@ phunt: phunt.c
 
 clean:
 	rm -f *.o
-	rm $(PROJECTDIR)/phunt
+	@rm $(PROJECTDIR)/phunt $(PROJECTDIR)/test_log
 
