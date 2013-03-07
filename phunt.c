@@ -92,26 +92,6 @@ int main(int argc, char **argv){
     exit(0);
 }//END main
 
-
-
-int writeToLog(char *message, int log_fd)
-{
-}
-
-
-
-int initConfig()
-{
-}
-
-
-
-int initLog()
-{
-}
-
-
-
 static void usage(char **argv)
 {
     printf("Usage: ");

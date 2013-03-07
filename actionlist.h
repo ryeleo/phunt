@@ -12,6 +12,8 @@ following the structure of this example:
 #include "action.h"
 
 
+#define MAX_BYTELEN_BUFFER 1024
+
 
 struct ActionList{
     struct Action action;
@@ -30,8 +32,19 @@ int initActionList(char *fileName, struct ActionList *actionList);
 
 
 /*
+Description: 
+
+Return: 
+*/
+int insertAction(struct Action *action, struct ActionList *actionList);
+
+
+
+
+/*
 Description: Get the next action from the action list, in a queue like fashion,
 but never actually removing any elements from the action.
+NOTE: We pass back a reference to the action, not a copy of it.
 
 Return: 
 */
