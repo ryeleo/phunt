@@ -51,6 +51,17 @@ Return: 0 upon success,
 int initAction(action_t at, param_t pt, void *param, struct Action *action);
 
 
+/*
+Takes the File of the first processas input, will iterate through pids in /proc until 
+it has checked each one whether it should take action on it. Criteria to 
+check will depend on current action.
+*/
+
+int actionLoop(filedescriptor file, ){
+
+}
+
+
 
 /*
 Description: Given an action, enforce that action.
@@ -66,7 +77,9 @@ filesystem every time it runs.
 -Is there any way to have this set-up with persistant open filedescriptors with
 RO Access
 */
-int takeAction(struct Action *action);
+int takeAction(struct Action *action){
+
+}
 
 
 
@@ -78,4 +91,9 @@ Description: Based on the action prints the intended behavior to the log.
 int actionToLog(char *out, struct Action *action){
 }
 
-int actionTakenToLog(char *out, struct)
+/*
+Description: Called when action is taken 
+
+*/
+int actionTakenToLog(char *out, struct Action *action){
+}
