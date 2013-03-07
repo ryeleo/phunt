@@ -67,3 +67,15 @@ filesystem every time it runs.
 RO Access
 */
 int takeAction(struct Action *action);
+
+
+
+
+/*
+Description: Based on the action prints the intended behavior to the log.
+
+*/
+int actionToLog(char *out, struct Action *action){
+}
+
+int actionTakenToLog(char *out, struct)
