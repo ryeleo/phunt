@@ -1,4 +1,5 @@
 #include "action.h"
+#include "log.h"
 
 int initAction(action_t at, param_t pt, void *param, struct Action *action){
     int ret;
@@ -30,7 +31,7 @@ int initAction(action_t at, param_t pt, void *param, struct Action *action){
 
 
 
-int toStringAction(char *out, struct Action *action){
+int actionToLog(char *out, struct Action *action){
 }
 
 
@@ -55,19 +56,12 @@ int takeAction(struct Action *action){
     return 0;
 }
 
-static inline int getUsersSnapshot(int uid, int *result_pids){
-}
-
-static inline int getMemorySnapshot(int memoryCap, int *result_pids){
-}
-
-static inline int getCwdSnapshot(char *path, int *result_pids){
-}
 
 
-static inline int parseProcCwd(){
+// getUidFromUser returns the user that owns the process
+static inline int getUidFromUser(str uname, int *result_pids){
 }
-static inline int parseProcUid(){
-}
-static inline int parseProcVmsize(){
+
+// GetUIDFromProcess Returns the uid of the owner of the process
+static inline int getUIDFromProcess(str uname, int *result_pids){
 }
