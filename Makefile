@@ -6,9 +6,13 @@ DEBUG		= -g -DDEBUG
 
 default: phunt
 
-test:
+test_util:
 	$(CC) test_util.c util.c $(CFLAGS) -g -DDEBUG -o $(PROJECTDIR)/test_util
+
+test_log:
 	$(CC) test_log.c log.c $(CFLAGS) -g -DDEBUG -o $(PROJECTDIR)/test_log
+
+test_actionlist:
 	$(CC) test_actionlist.c actionlist.c $(CFLAGS) -g -DDEBUG -o $(PROJECTDIR)/test_actionlist
 
 debug: CFLAGS += $(DEBUG)
