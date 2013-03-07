@@ -1,4 +1,5 @@
 /* 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
+James Ingalls <james.ingalls@gmail.com>
 action.c provides an implmentation of a process manager based on the /proc/ 
 filesystem. This is also based on the idea of taking an "action" on a subset of
 processes that have a certain "attribute." The attributes are currently as
