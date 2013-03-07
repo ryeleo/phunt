@@ -1,7 +1,10 @@
+// 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
+// 2013 - James Ingalls <james.ingalls@gmail.com>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+
 
 
 #define MAX_OPT_LEN 256
