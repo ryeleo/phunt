@@ -1,7 +1,10 @@
+// 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
+// 2013 - James Ingalls <james.ingalls@gmail.com>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+
 
 
 #define MAX_OPT_LEN 256
@@ -88,26 +91,6 @@ int main(int argc, char **argv){
 
     exit(0);
 }//END main
-
-
-
-int writeToLog(char *message, int log_fd)
-{
-}
-
-
-
-int initConfig()
-{
-}
-
-
-
-int initLog()
-{
-}
-
-
 
 static void usage(char **argv)
 {
