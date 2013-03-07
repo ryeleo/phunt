@@ -5,4 +5,4 @@ offset reflects the number of characters returned.
 
 Return: Number of characters returned in retLine on success,
 */
-static int readLine(int fd, char *retLine, int retLineLength);
+int readLine(int fd, char *retLine, int retLineLength);
