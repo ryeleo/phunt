@@ -6,17 +6,7 @@
 #include <string.h>
 
 
-
 #define MAX_OPT_LEN 256
-const enum error = {
-    IndexError = -2,
-    Error = -1
-};
-
-const char *strError();
-
-const char *strError();
-
 
 static void usage(char **argv);
 

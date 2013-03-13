@@ -18,13 +18,18 @@ int main(int argc, char **argv){
     // Test how parsing a config file goes
     initActionList(fileName[0], &actionList);
 
-
     // Print all of the actions in the ActionList
-    for(){
-        getAction(&action, );
-        nextAction();
-        printf();
+    for(i=0 ; i < 10 ; i++){
+        ret = getAction(&action, &actionList);
+        printf("ret = %d\n", ret);
+        ret = nextAction(&actionList);
+        printf("ret = %d\n", ret);
+        printf("%d, %d, %s\n", action.actionType, action.paramType, (char*)action.param.pathName);
     }
 
-     
+    // Lets see if the free function works
+    // ret = freeActionList(&actionList);
+    printf("ret = %d\n", ret);
+
+    return 0; 
 }

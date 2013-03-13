@@ -15,7 +15,7 @@ int readLine(int fd, char *retLine, int retLineLength){
     if (bytesRead == -1)
         return -4; // indicate we cannot open file
     if (bytesRead == 0)
-        return 0;  // indicate that we are at the end of the file
+        return -6;  // indicate that we are at the end of the file
 
     // Find the newline, and replace it with the null terminator
     for ( bytesInLine=0 ; retLine[bytesInLine] != '\n' && bytesInLine < retLineLength ; bytesInLine++ );
@@ -27,4 +27,15 @@ int readLine(int fd, char *retLine, int retLineLength){
     lseek(fd, -(bytesRead-bytesInLine-1), SEEK_CUR);
 
     return bytesInLine;
+}
+
+static char errString[MAX_STRLEN_ERROR];
+char *strError(int errorCode){
+    switch(errorCode){
+        case IOError:
+            return errString;
+        default:
+            return NULL;
+    }
+    
 }

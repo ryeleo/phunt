@@ -13,32 +13,45 @@ The actions that can be taken on the above stated items are:
 -suspend
 -kill
 */
+#ifndef __ACTION_H__
+#define __ACTION_H__
 
 #define MAX_STRLEN_FILENAME 256
 
 // Defines the types of actions that can be taken
-typedef action_t short;
+typedef short  action_t;
 #define at_kill 0
 #define at_susp 1
 #define at_nice 2
+const char *actionStrings[3] = {
+    "kill",
+    "suspend",
+    "nice"
+};
 
 // Defines the types of parameters that may be passed
-typedef param_t short;
+typedef short param_t;
 #define pt_user 0
 #define pt_path 1
 #define pt_mem  2
+const char *paramStrings[3] = {
+    "user",
+    "path",
+    "memory"
+};
+
+// Defines the parameter itself
+typedef union{
+    char *pathName;
+    int uid;
+    int memoryCap;  // in KB
+} Parameter;
 
 struct Action{
     action_t actionType;
     param_t paramType;
-    union{
-        char *pathName;
-        int uid;
-        int memoryCap; // in kiloBytes
-    }; //parameter passed
+    Parameter param;
 };
-
-
 
 /*
 This will simply initialize all of the fields in the action struct.
@@ -46,9 +59,10 @@ This will simply initialize all of the fields in the action struct.
 
 type: The type of action which will be taken.
 param: Depending on the type, this will be parsed accordingly.
-Return: 0 upon success,
+Return: 0 upon success, -6 upon invalid parameter passed
 */
-int initAction(action_t at, param_t pt, void *param, struct Action *action);
+int initAction(action_t at, param_t pt, Parameter *param, struct Action *action);
+
 
 
 /*
@@ -57,9 +71,7 @@ it has checked each one whether it should take action on it. Criteria to
 check will depend on current action.
 */
 
-int actionLoop(filedescriptor file, ){
-
-}
+int actionLoop(int fd);
 
 
 
@@ -76,11 +88,36 @@ efficiancy here is of interest. This function will have to look at the /proc
 filesystem every time it runs.
 -Is there any way to have this set-up with persistant open filedescriptors with
 RO Access
+
+Return: -6 upon invalid parameter passed
 */
-int takeAction(struct Action *action){
+int takeAction(struct Action *action);
 
-}
+/*
+Description: A helper function for people who are building actions. This will build
+a Parameter based on the provided param_type.
 
+Return: 0 on success, -2 if incorrect parameter passed
+*/
+int getParam(param_t param_type, Parameter *param);
+    
+/*
+Description: A helper function for people who are building actions. This will take
+a character array and let the user know via the return value what type of parameter
+the passed string matches.
+
+Return: the parameter type on success, -2 if incorrect parameter passed
+*/
+param_t getParamType(char *paramTypeStr);
+
+/*
+Description: A helper function for people who are building actions. This will take 
+a character array and let know which of our action types it matches via the return
+value.
+
+Return: the action type on success, -2 if incorrect parameter passed
+*/
+action_t getActionType(char *actionTypeStr);
 
 
 
@@ -88,12 +125,20 @@ int takeAction(struct Action *action){
 Description: Based on the action prints the intended behavior to the log.
 
 */
-int actionToLog(char *out, struct Action *action){
-}
+int actionToLog(char *out, struct Action *action);
+
+
 
 /*
 Description: Called when action is taken 
 
 */
-int actionTakenToLog(char *out, struct Action *action){
-}
+int actionTakenToLog(char *out, struct Action *action);
+
+
+/*
+Description: Frees the allocated fields of an action, as well as 
+*/
+int freeAction(struct Action *action);
+
+#endif//__ACTION_H__

@@ -3,3 +3,8 @@
 *~
 *.o
 *.fuse*
+test_log
+test_util
+test_action
+test_actionlist
+phunt

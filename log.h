@@ -5,6 +5,8 @@ usage for this program would be to log behaviour of a process. This supports
 logging messages of the following form.
 YYYY/MM/DD HH:MM:SS <prefix>: <message>
 */
+#ifndef __LOG_H__
+#define __LOG_H__
 
 #define MAX_STRLEN_TIME 32
 #define MAX_STRLEN_PREFIX 32      
@@ -56,3 +58,5 @@ Return: 0 if success, -1 if general memory Error, -2 if any parameter passed is
 incorrectly NULL, -4 if ioError (could not write to log_fd).
 */
 int writeMessage(char *message, struct Log *log);
+
+#endif//__LOG_H__
