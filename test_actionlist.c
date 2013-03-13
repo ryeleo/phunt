@@ -9,27 +9,36 @@ int main(int argc, char **argv){
         "testactionlist.config"
     };
 
-    int i, ret;
-    struct ActionList actionList;
-    struct Action action;
+    int ret;
+    struct ActionList *p_actionList;
 
     printf("===\nRunning Test Set for ActionList.\n===\n\n");
 
     // Test how parsing a config file goes
-    initActionList(fileName[0], (&actionList));
+    ret = initActionList(fileName[0], &p_actionList);
+    if (ret < 0)
+        printf("motherfuckin issues!");
 
     // Print all of the actions in the ActionList
-    for(i=0 ; i < 10 ; i++){
-        ret = getAction(&action, &actionList);
-        printf("ret = %d\n", ret);
-        ret = nextAction(&actionList);
-        printf("ret = %d\n", ret);
-        printf("%d, %d, %s\n", action.actionType, action.paramType, (char*)action.param.pathName);
-    }
+    // Notice that this is the general way to iterate through the list
+    struct ActionList *pal = p_actionList;
+    struct Action *p_action;
+    do{
+        ret = getAction(&p_action, &pal);
+        if (ret < 0)
+            printf("motherfuckin issues!");
+
+        ret = nextAction(&pal);
+        if (ret < 0)
+            printf("motherfuckin issues!");
+
+        printf("%d, %d, %d\n", p_action->actionType, p_action->paramType, p_action->param.uid);
+    } while ( pal != p_actionList );
 
     // Lets see if the free function works
-    // ret = freeActionList(&actionList);
-    printf("ret = %d\n", ret);
+    ret = freeActionList(&p_actionList);
+    if (ret < 0)
+        printf("motherfuckin issues!");
 
     return 0; 
 }

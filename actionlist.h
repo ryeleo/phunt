@@ -34,7 +34,8 @@ struct ActionList{
 
 
 /*
-Description: Initialize actionList from the file provided in fileName.
+Description: Initialize actionList from the file provided in fileName. Assumes that
+the provided actionList item is established already.
 
 Return: 0 upon success
 */
@@ -59,7 +60,7 @@ NOTICE: We pass back a reference to the action, not a copy of it.
 
 Return: 0 upon success,
 */
-int getAction(struct Action *retAction, struct ActionList **actionList);
+int getAction(struct Action **retAction, struct ActionList **actionList);
 
 
 

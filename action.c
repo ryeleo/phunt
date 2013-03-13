@@ -21,29 +21,34 @@ const char *paramStrings[3] = {
 };
 
 
-int initAction(action_t at, param_t pt, Parameter *param, struct Action *action){
+int initAction(action_t at, param_t pt, char *param, struct Action *action){
+    int ret;
 
     ///// copy action type and param type to action
     action->paramType = pt;
     action->actionType = at;
 
-
     ///// copy the parameter
-    switch(action->paramType){
+    switch (action->paramType){
         case pt_user:
-            action->param.uid = param->uid;
-            break;
-        case pt_mem:
-            action->param.memoryCap = param->memoryCap;
+            ret = getUidFromUser(param);
+            if (ret < 0)
+                return -2;
+            else
+                action->param.uid = ret;
             break;
         case pt_path:
-            action->param.pathName = malloc(strnlen(param->pathName, MAX_STRLEN_FILENAME));
-            strncpy(action->param.pathName, param->pathName, strnlen(param->pathName, MAX_STRLEN_FILENAME));
-            action->param.pathName[MAX_STRLEN_FILENAME-1] = '\0';
+            action->param.pathName = malloc(MAX_STRLEN_FILENAME);
+            strncpy(action->param.pathName, param, strnlen(param, MAX_STRLEN_FILENAME));
+            break;
+        case pt_mem:
+            ret = sscanf(param, "%d", &(action->param.memoryCap));
+            if (ret != 1 || action->param.memoryCap < 0) // if we did not have a good param
+                return -2;
             break;
         default:
-            return -2;  // Indicates incorrect parameter passed
-    }   
+            return -2;
+    }
 
     return 0;
 }
@@ -76,31 +81,6 @@ int takeAction(struct Action *action){
     return 0;
 }
 
-
-int getParam(param_t param_type, char *param, Parameter *ret_param){
-    int ret;
-    switch (param_type){
-        case pt_user:
-            ret = getUidFromUser(param);
-            if (ret > 0)
-                return -2;
-            else
-                ret_param->uid = ret;
-            break;
-        case pt_path:
-            ret_param->pathName = malloc(MAX_STRLEN_FILENAME);
-            strncpy(ret_param->pathName, param, strnlen(param, MAX_STRLEN_FILENAME));
-            break;
-        case pt_mem:
-            sscanf(param, "%d", &(ret_param->memoryCap));
-            break;
-        default:
-            return -2;
-    }
-
-    return 0;
-}
-
 param_t getParamType(char *paramTypeStr){
     if ( 0 == strncmp(paramTypeStr, paramStrings[pt_user], MAX_STRLEN_FILENAME) )    
         return pt_user;
@@ -128,7 +108,6 @@ int freeAction(struct Action *action){
         free(action->param.pathName);
     return 0; 
 }
-
 
 
 

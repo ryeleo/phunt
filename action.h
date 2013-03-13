@@ -57,7 +57,7 @@ type: The type of action which will be taken.
 param: Depending on the type, this will be parsed accordingly.
 Return: 0 upon success, -6 upon invalid parameter passed
 */
-int initAction(action_t at, param_t pt, Parameter *param, struct Action *action);
+int initAction(action_t at, param_t pt, char *param, struct Action *action);
 
 
 
@@ -88,14 +88,6 @@ RO Access
 Return: -6 upon invalid parameter passed
 */
 int takeAction(struct Action *action);
-
-/*
-Description: A helper function for people who are building actions. This will build
-a Parameter based on the provided param_type and the param.
-
-Return: 0 on success, -2 if incorrect parameter passed
-*/
-int getParam(param_t param_type, char *param, Parameter *ret_param);
     
 /*
 Description: A helper function for people who are building actions. This will take
