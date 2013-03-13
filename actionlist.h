@@ -15,6 +15,7 @@ from the begining to the end.
 #ifndef __ACTIONLIST_H__
 #define __ACTIONLIST_H__
 
+
 #include "action.h"
 
 
@@ -37,7 +38,7 @@ Description: Initialize actionList from the file provided in fileName.
 
 Return: 0 upon success
 */
-int initActionList(char *fileName, struct ActionList *actionList);
+int initActionList(char *fileName, struct ActionList **actionList);
 
 
 
@@ -46,7 +47,7 @@ Description: Inserts the provided action into actionList.
 
 Return: 0 upon success
 */
-int insertAction(struct Action *action, struct ActionList *actionList);
+int insertAction(struct Action *action, struct ActionList **actionList);
 
 
 
@@ -58,7 +59,7 @@ NOTICE: We pass back a reference to the action, not a copy of it.
 
 Return: 0 upon success,
 */
-int getAction(struct Action *retAction, struct ActionList *actionList);
+int getAction(struct Action *retAction, struct ActionList **actionList);
 
 
 
@@ -68,7 +69,7 @@ list. This should generally be called in juncture with getAction().
 
 Return: 0 upon success
 */
-int nextAction(struct ActionList *actionList);
+int nextAction(struct ActionList **actionList);
 
 /*
 Description: Free all elements from actionList which were inserted using the 
@@ -77,6 +78,6 @@ and will result in actionList being a NULL pointer.
 
 Return:
 */
-int freeActionList(struct ActionList *actionList);
+int freeActionList(struct ActionList **actionList);
 
 #endif//__ACTIONLIST_H__

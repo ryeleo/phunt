@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 
-int initActionList(char *fileName, struct ActionList *actionList){
+int initActionList(char *fileName, struct ActionList **actionList){
     int ret;
     int fd;
     int lineLen;
@@ -21,6 +21,12 @@ int initActionList(char *fileName, struct ActionList *actionList){
     param_t  param_type;
     Parameter a_param;
     struct Action action;
+
+
+    ///// Set all of the pointers to null
+    actionList->prev = NULL;
+    actionList->next = NULL;
+    actionList->head = NULL;
 
 
     ///// Parse the provided config file, adding all of the actions to actionList
@@ -39,6 +45,8 @@ int initActionList(char *fileName, struct ActionList *actionList){
             return -4;// indicates that there was read error
         else if (lineLen == -6)
             break;      // indicates that we are done reading from the file
+        else if (lineLen == 0)
+            continue;   // indicates that this line is blank
 
         // If line begins with '#', ignore it
         if (line[0] == '#')
@@ -64,7 +72,7 @@ int initActionList(char *fileName, struct ActionList *actionList){
             param_type = ret;
 
         // ... and the paramater
-        ret = getParam(param_type, &a_param);
+        ret = getParam(param_type, paramStr, &a_param);
         if (ret == -2)
             return -4; // indicates that something went wrong in IO
 
@@ -79,17 +87,16 @@ int initActionList(char *fileName, struct ActionList *actionList){
 }
 
 
-int insertAction(struct Action *action, struct ActionList *actionList){
+int insertAction(struct Action *action, struct ActionList **actionList){
     struct Action *newAction;
     struct ActionList *newActionListItem;
 
     // Make sure that params aren't null
-    if (actionList == NULL || action == NULL)
+    if (*actionList == NULL || action == NULL)
         return -2;
 
     ///// malloc space for new action
     newAction = malloc(sizeof(struct Action));
-
 
     ///// insert contents of new action
     memcpy(newAction, action, sizeof(struct Action));
@@ -100,32 +107,32 @@ int insertAction(struct Action *action, struct ActionList *actionList){
     newActionListItem = malloc(sizeof(struct ActionList));
 
     // if we are the first guy on the block, set next to ourself
-    if (actionList->next == NULL)
+    if ((*actionList)->next == NULL)
         newActionListItem->next = newActionListItem;
     else
-        newActionListItem->next = actionList->next;
+        newActionListItem->next = (*actionList)->next;
 
     // if we are the first guy on the block, set prev to ourself
-    if (actionList->prev == NULL)
+    if ((*actionList)->prev == NULL)
         newActionListItem->prev = newActionListItem;
     else
-        newActionListItem->prev = actionList;
+        newActionListItem->prev = (*actionList);
 
     // if we are first guy on the block, set head to ourself also
-    if (actionList->head == NULL)
-        newActionListItem->head = actionList;
+    if ((*actionList)->head == NULL)
+        newActionListItem->head = newActionListItem;
     else
-        newActionListItem->head = actionList->head;
+        newActionListItem->head = (*actionList)->head;
 
-    // finally, set actionList to point to the newly inserter action.
-    actionList = newActionListItem;
+    // finally, set actionList to point to the newly inserted action.
+    (*actionList) = newActionListItem;
 
     return 0;
 }
 
 
 
-int getAction(struct Action *retAction, struct ActionList *actionList){
+int getAction(struct Action *retAction, struct ActionList **actionList){
     // Make sure that params aren't null
     if (actionList == NULL)
         return -2;
@@ -137,31 +144,38 @@ int getAction(struct Action *retAction, struct ActionList *actionList){
 
 
 
-int nextAction(struct ActionList *actionList){
+int nextAction(struct ActionList **actionList){
     // Make sure that params aren't null
-    if (actionList == NULL || actionList->next == NULL)
+    if ((*actionList) == NULL || (*actionList)->next == NULL)
         return -2;
 
     ///// Simply update actionList to point to the next element.
-    actionList = actionList->next;
+    (*actionList) = (*actionList)->next;
 
     return 0;
 }
 
 
 
-int freeActionList(struct ActionList *actionList){
+int freeActionList(struct ActionList **actionList){
+    struct ActionList *ptrActionList;
+
     // Make sure that params aren't null
-    if (actionList == NULL)
+    if ((*actionList) == NULL)
         return -2;
 
     // Step through each actionListItem and free it
-    while(actionList->next != actionList){
-        freeAction(&actionList->action);
-        free(actionList);
+    while((*actionList)->next != (*actionList)){
+        // free the action
+        freeAction(&((*actionList)->action);
+
+        // free the action list
+        ptrActionList = *actionList;
         nextAction(actionList);
+        free(ptrActionList);
     }
-    freeAction(&actionList->action);
-    free(actionList);
+    freeAction(&((*actionList)->action));
+    free(*actionList);
+    *actionList = NULL;
     return 0;
 }

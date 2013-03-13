@@ -2,11 +2,23 @@
 // 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
 #include "action.h"
 #include "log.h"
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 // We must have a global log in order to takeAction().
 extern struct Log *log;
+
+const char *actionStrings[3] = {
+    "kill",
+    "suspend",
+    "nice"
+};
+const char *paramStrings[3] = {
+    "user",
+    "path",
+    "memory"
+};
 
 
 int initAction(action_t at, param_t pt, Parameter *param, struct Action *action){
@@ -65,21 +77,26 @@ int takeAction(struct Action *action){
 }
 
 
-int getParam(param_t param_type, Parameter *param){
-        switch (param_type){
-            case pt_user:
-                sscanf(paramStr, "%d", &param.uid);
-                break;
-            case pt_path:
-                param.pathName = malloc(MAX_STRLEN_FILENAME);
-                strncpy(param.pathName, paramStr, strnlen(paramStr, MAX_STRLEN_FILENAME));
-                break;
-            case pt_mem:
-                sscanf(paramStr, "%d", &param.memoryCap);
-                break;
-            default:
+int getParam(param_t param_type, char *param, Parameter *ret_param){
+    int ret;
+    switch (param_type){
+        case pt_user:
+            ret = getUidFromUser(param);
+            if (ret > 0)
                 return -2;
-        }
+            else
+                ret_param->uid = ret;
+            break;
+        case pt_path:
+            ret_param->pathName = malloc(MAX_STRLEN_FILENAME);
+            strncpy(ret_param->pathName, param, strnlen(param, MAX_STRLEN_FILENAME));
+            break;
+        case pt_mem:
+            sscanf(param, "%d", &(ret_param->memoryCap));
+            break;
+        default:
+            return -2;
+    }
 
     return 0;
 }
@@ -106,15 +123,25 @@ action_t getActionType(char *actionTypeStr){
         return -2;
 }
 
+int freeAction(struct Action *action){
+    if (action->paramType == pt_path)
+        free(action->param.pathName);
+    return 0; 
+}
 
 
 
-// getUidFromUser returns the user that owns the process
-static inline int getUidFromUser(char *uname, int *result_pids){
+
+// getUidFromUser returns the uid given a username
+int getUidFromUser(char *uname){
+    // #include <sys/types.h>
+    // #include <pwd.h>
+    // man 3 getpwnam
+    // struct passwd *getpwnam(const char *name);
     return 0;
 }
 
 // GetUIDFromProcess Returns the uid of the owner of the process
-static inline int getUIDFromProcess(char *uname, int *result_pids){
+int getUIDFromProcess(char *uname){
     return 0;
 }

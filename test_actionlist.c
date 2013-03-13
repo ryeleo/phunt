@@ -16,7 +16,7 @@ int main(int argc, char **argv){
     printf("===\nRunning Test Set for ActionList.\n===\n\n");
 
     // Test how parsing a config file goes
-    initActionList(fileName[0], &actionList);
+    initActionList(fileName[0], (&actionList));
 
     // Print all of the actions in the ActionList
     for(i=0 ; i < 10 ; i++){

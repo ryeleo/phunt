@@ -18,27 +18,23 @@ The actions that can be taken on the above stated items are:
 
 #define MAX_STRLEN_FILENAME 256
 
+
 // Defines the types of actions that can be taken
 typedef short  action_t;
 #define at_kill 0
 #define at_susp 1
 #define at_nice 2
-const char *actionStrings[3] = {
-    "kill",
-    "suspend",
-    "nice"
-};
+extern const char *actionStrings[3];
+// = { "kill", "suspend", "nice" };
+
 
 // Defines the types of parameters that may be passed
 typedef short param_t;
 #define pt_user 0
 #define pt_path 1
 #define pt_mem  2
-const char *paramStrings[3] = {
-    "user",
-    "path",
-    "memory"
-};
+extern const char *paramStrings[3];
+// = { "user", "path", "memory" };
 
 // Defines the parameter itself
 typedef union{
@@ -95,11 +91,11 @@ int takeAction(struct Action *action);
 
 /*
 Description: A helper function for people who are building actions. This will build
-a Parameter based on the provided param_type.
+a Parameter based on the provided param_type and the param.
 
 Return: 0 on success, -2 if incorrect parameter passed
 */
-int getParam(param_t param_type, Parameter *param);
+int getParam(param_t param_type, char *param, Parameter *ret_param);
     
 /*
 Description: A helper function for people who are building actions. This will take
@@ -126,6 +122,18 @@ Description: Based on the action prints the intended behavior to the log.
 
 */
 int actionToLog(char *out, struct Action *action);
+
+
+
+/*
+*/
+int getUidFromUser(char *uname);
+
+
+
+/*
+*/
+int getUIDFromProcess(char *uname);
 
 
 

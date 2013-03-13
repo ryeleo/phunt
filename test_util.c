@@ -40,6 +40,18 @@ int main(int argc, char **argv){
     ret = readLine(fd, line, LINE_LENGTH);
     printf("ret = %d\n", ret);
     printf("line = %s\n", line);
+    ret = readLine(fd, line, LINE_LENGTH);
+    printf("ret = %d\n", ret);
+    printf("line = %s\n", line);
+    ret = readLine(fd, line, LINE_LENGTH);
+    printf("ret = %d\n", ret);
+    printf("line = %s\n", line);
+    ret = readLine(fd, line, LINE_LENGTH);
+    printf("ret = %d\n", ret);
+    printf("line = %s\n", line);
+    ret = readLine(fd, line, LINE_LENGTH);
+    printf("ret = %d\n", ret);
+    printf("line = %s\n", line);
 
     return 0;
 }
