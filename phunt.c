@@ -5,10 +5,15 @@
 #include <unistd.h>
 #include <string.h>
 
-
 #define MAX_OPT_LEN 256
 
+#define printError(errorCode) do( printf("Error: %s -- %s:%d\n    Message:", __FILE__, __func__, __LINE__, strError(errorCode)); )while{0};
+/*
+Description: Prints the usage to user
+*/
 static void usage(char **argv);
+
+
 
 /* 
     Main should do all initialization and interaction with the user. It should
@@ -32,6 +37,9 @@ int main(int argc, char **argv){
         logFileName[MAX_OPT_LEN] = "/var/log/phunt.log",    // Filename of log to append to while running this process
         configFileName[MAX_OPT_LEN] = "/etc/phunt.conf";    // Filename of configuration for running this process
 
+    struct Log log;
+    struct ActionList *actionList;
+
 
 
 #ifdef DEBUG
@@ -39,8 +47,7 @@ int main(int argc, char **argv){
 #endif
 
 
-
-    ////////// Usage & Parse parameters
+    ///// Usage & Parse parameters
     // Parse options provided at CL
     while ((ret = getopt(argc, argv, "l:c:d")) != -1)
     {
@@ -64,23 +71,65 @@ int main(int argc, char **argv){
     }
 
 
-    ////////// Initialize log and config file
-    ret = initConfig(configFileName);
-    if (ret == -1)
-    {
-        printf("Unable to initialize based on configuration file: %s\n", configFileName);
+    ///// Initialize log and actionList
+    // initialize the actionList
+    ret = initActionList(configFileName, &actionList);
+    if (ret < 0){
+        printError(ret);
         exit(0);
     }
-    ret = initLog(logFileName);
-    if (ret == -1)
-    {
-        printf("Unable to initialize based on log file: %s\n", configFileName);
-        exit(0);
-    }
-      
+
+    struct Log log, *log_p;
+    struct Log *h_log;
+
+    printf("===\nRunning Test Set for Logging System.\n===\n\n");
+
+    // Test stack log and 
+    log_p = &log;
+    initLog(fileName[0], prefix[0], log_p);
+    for(i = 0 ; i < 4 ; i++)
+        writeMessage(lines[i], log_p);
+    closeLog(log_p); 
+    printf("Finished testing Log on stack: %s\n", fileName[0]);
+
+    // Print all of the actions in the ActionList
+    // Notice that this is the general way to iterate through the list
+    struct ActionList *pal = p_actionList;
+    struct Action *p_action;
+    do{
+        ///// Get the next action in the list
+        ret = getAction(&p_action, &pal);
+        if (ret < 0){
+            printError(ret);
+            exit(0);
+        }
+        // Incrament our list to the next action
+        ret = nextAction(&pal);
+        if (ret < 0){
+            printError(ret);
+            exit(0);
+        }
+
+        ///// fulfil the next action
+        ret = takeAction(p_action);
+        if (ret < 0){
+            printError(ret);
+            exit(0);
+        }
+
+        printf("%d, %d, %d\n", p_action->actionType, p_action->paramType, p_action->param.uid);
+    } while ( pal != p_actionList );
+
+    // Clear up all of the memory used in the actionList
+    ret = freeActionList(&p_actionList);
+    if (ret < 0)
+        printError(ret);
+
+
 
     exit(0);
 }//END main
+
 
 static void usage(char **argv)
 {

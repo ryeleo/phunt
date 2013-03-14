@@ -1,16 +1,27 @@
+// 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
 /* 
-2013 - Ryan Leonard <ryan.leonard71@gmail.com>
 ActionList offers a way to load from a predefined .conf file with the format
 following the structure of this example:
 
     # Comments are started with hashes
-    # <action_type> <param_type> <param>
+    # <action_type>    <param_type>    <param>
     kill user badguy
+    nice user     butler
 
     # Extra spaces are ignored
 
 Further, the action list gives the ability to continuously cycle through actions
-from the begining to the end.
+from the begining to the end. The prototype for how to do this is printed below.
+
+// How to iterate through the actionList
+struct ActionList *pal = p_actionList;
+struct Action *p_action;
+do{
+    getAction(&p_action, &pal);
+    nextAction(&pal);
+    printf("%d, %d\n", p_action->actionType, p_action->paramType);
+} while ( pal != p_actionList );
+
 */
 #ifndef __ACTIONLIST_H__
 #define __ACTIONLIST_H__

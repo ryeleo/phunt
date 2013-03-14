@@ -30,7 +30,7 @@ Return Values:
 -2  Incorrect Parameter Passed
 -3  XXX
 -4  IO Error
--5  
--6  Something
+-5  Buffer provided was not large enough to fit content
+-6  End Of File
 -7
 -8

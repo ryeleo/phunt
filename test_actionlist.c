@@ -1,3 +1,4 @@
+// 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
 #include "actionlist.h"
 #include "action.h"
 #include <stdio.h>
@@ -6,7 +7,7 @@
 
 int main(int argc, char **argv){
     char *fileName[1] = {
-        "testactionlist.config"
+        "./testFiles/testactionlist.config"
     };
 
     int ret;

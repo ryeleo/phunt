@@ -21,9 +21,9 @@ int main(int argc, char **argv){
         "Testing_Logs_WithREAllyReallyReallWayTooLongPrefixThatHopefullyNobodyWillEverUse"
     };
     char *fileName[3] = {
-        "testlog_stackLog.txt",
-        "testlog_heapLog.txt",
-        "testlog_longstuff.txt"
+        "./testFiles/testlog_stackLog.txt",
+        "./testFiles/testlog_heapLog.txt",
+        "./testFiles/testlog_longstuff.txt"
     };
 
     int i, ret;

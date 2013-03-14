@@ -1,8 +1,8 @@
+// 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
 #include "util.h"
 #include <stdlib.h>
 #include <unistd.h>
 
-// XXX Check that there are no off-by-one issues or anything
 int readLine(int fd, char *retLine, int retLineLength){
     int bytesInLine;
     int bytesRead;
@@ -14,7 +14,7 @@ int readLine(int fd, char *retLine, int retLineLength){
     // Read as as we are allowed to given the provided buffer
     bytesRead = read(fd, retLine, retLineLength);
     if (bytesRead == -1)
-        return -4; // indicate we cannot open file
+        return -4;  // indicate we had IO error
     if (bytesRead == 0)
         return -6;  // indicate that we are at the end of the file
 
@@ -30,13 +30,17 @@ int readLine(int fd, char *retLine, int retLineLength){
     return bytesInLine;
 }
 
-static char errString[MAX_STRLEN_ERROR];
-char *strError(int errorCode){
+
+
+const char *strError(int errorCode){
+    char *errString = NULL;
     switch(errorCode){
         case IOError:
-            return errString;
+            errString = errorStrings[4];
+            break;
+        case IOError:
         default:
-            return NULL;
+            break;
     }
-    
+    return errString;
 }

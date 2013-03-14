@@ -7,7 +7,7 @@
 #define LINE_LENGTH 128
 
 int main(int argc, char **argv){
-    char *fileName = "testutil.txt";
+    char *fileName = "./testFiles/testutil.txt";
     char line[LINE_LENGTH];
 
     int ret, fd;
