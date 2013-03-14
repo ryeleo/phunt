@@ -44,10 +44,13 @@ const char *errorString[] = {
     "",
     "IO Error has occured, verify all file descriptors",
 }
-#define MemError -1
-#define IncParam -2
-#define XXX -3
+#define NoneErr
+#define MemErr -1
+#define NullParamErr -2
+#define CodeErr -3
 #define IOError -4
+#define 
+
 #define MAX_STRLEN_ERROR 256
 
 #endif//__UTIL_H__

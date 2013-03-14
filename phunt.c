@@ -6,24 +6,26 @@
 #include <string.h>
 
 #define MAX_OPT_LEN 256
+extern struct Log *log;
 
-#define printError(errorCode) do( printf("Error: %s -- %s:%d\n    Message:", __FILE__, __func__, __LINE__, strError(errorCode)); )while{0};
+
 /*
-Description: Prints the usage to user
+Description: Macro for printing errors IN THE MAIN METHOD ONLY
+*/
+#define printError(errorCode) do( printf("Error: %s -- %s:%d\n    Message:", __FILE__, __func__, __LINE__, strError(errorCode)); )while{0};
+
+/*
+Description: Prints the usage to user.
 */
 static void usage(char **argv);
 
 
 
 /* 
-    Main should do all initialization and interaction with the user. It should
-    also in the case of the request of running as a daemon, be forked and moved 
-    to the appropriate environment. E.g. change current directory, changed
-    parent process to the init process, etc...
-    -- Heavy Lifting --
-    Initialize_everything;
-    if (-d) daemonize();
-    while
+Main should do all initialization and interaction with the user. It should
+also in the case of the request of running as a daemon, be forked and moved 
+to the appropriate environment. E.g. change current directory, changed
+parent process to the init process, etc...
 */
 int main(int argc, char **argv){
 
@@ -37,14 +39,19 @@ int main(int argc, char **argv){
         logFileName[MAX_OPT_LEN] = "/var/log/phunt.log",    // Filename of log to append to while running this process
         configFileName[MAX_OPT_LEN] = "/etc/phunt.conf";    // Filename of configuration for running this process
 
-    struct Log log;
-    struct ActionList *actionList;
+    struct Action *action;  // An action pointer used when interacting with the actionList
 
+    struct ActionList 
+        *actionList         // The main actionList
+        *actionList_iter;   // Iterator for the main actionList
 
+    struct Log phunt_log;   // The log structure for the phunt process
+    log = &phunt_log;       // Set the global, externed log to point to the phunt process's log
 
 #ifdef DEBUG
     printf("===\nRunning %s in Debug mode.\n===\n\n", argv[0]);
 #endif
+
 
 
     ///// Usage & Parse parameters
@@ -78,57 +85,69 @@ int main(int argc, char **argv){
         printError(ret);
         exit(0);
     }
-
-    struct Log log, *log_p;
-    struct Log *h_log;
-
-    printf("===\nRunning Test Set for Logging System.\n===\n\n");
-
-    // Test stack log and 
-    log_p = &log;
-    initLog(fileName[0], prefix[0], log_p);
-    for(i = 0 ; i < 4 ; i++)
-        writeMessage(lines[i], log_p);
-    closeLog(log_p); 
-    printf("Finished testing Log on stack: %s\n", fileName[0]);
-
-    // Print all of the actions in the ActionList
-    // Notice that this is the general way to iterate through the list
-    struct ActionList *pal = p_actionList;
-    struct Action *p_action;
-    do{
-        ///// Get the next action in the list
-        ret = getAction(&p_action, &pal);
-        if (ret < 0){
-            printError(ret);
-            exit(0);
-        }
-        // Incrament our list to the next action
-        ret = nextAction(&pal);
-        if (ret < 0){
-            printError(ret);
-            exit(0);
-        }
-
-        ///// fulfil the next action
-        ret = takeAction(p_action);
-        if (ret < 0){
-            printError(ret);
-            exit(0);
-        }
-
-        printf("%d, %d, %d\n", p_action->actionType, p_action->paramType, p_action->param.uid);
-    } while ( pal != p_actionList );
-
-    // Clear up all of the memory used in the actionList
-    ret = freeActionList(&p_actionList);
-    if (ret < 0)
+    // initializt the log 
+    ret = initLog(fileName[0], prefix[0], log);
+    if (ret < 0){
         printError(ret);
+        exit(0);
+    }
 
 
 
+    ///// Daemonize if we are asked to
+    if (isDaemon == 1){
+        ret = fork();
+        if (ret != 0) // if there was an error or we are the parent
+            exit(0); 
+    }
+
+
+
+    ///// Event Loop
+    while(1){
+        // Run through the list of actions and fulfill (takeAction) each
+        actionList_iter = actionList;
+        do{
+            ///// Get the next action in the list
+            ret = getAction(&p_action, &actionList_iter);
+            if (ret < 0){
+                printError(ret);
+                exit(0);
+            }
+            // Incrament our list to the next action
+            ret = nextAction(&actionList_iter);
+            if (ret < 0){
+                printError(ret);
+                exit(0);
+            }
+
+            ///// fulfil the next action
+            ret = takeAction(p_action);
+            if (ret < 0){
+                printError(ret);
+                exit(0);
+            }
+        } while ( actionList_iter != actionList );
+    }
+
+
+
+    ///// Clear up all resources used
+    // clear memory from actionList
+    ret = freeActionList(&p_actionList);
+    if (ret < 0){
+        printError(ret);
+    }
+    // release open log resources
+    ret = closeLog(log); 
+    if (ret < 0){
+        printError(ret);
+    }
+
+    // DONE!!!
     exit(0);
 }//END main
+
 
 
 static void usage(char **argv)

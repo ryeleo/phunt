@@ -21,6 +21,10 @@ int initActionList(char *fileName, struct ActionList **actionList){
     param_t  param_type;
     struct Action action;
 
+    // Make sure params are not null
+    if (fileName == NULL || actionList == NULL)
+        return NullParamErr;
+
     // assure that the actionList is initialized to null
     (*actionList) = NULL;
 
@@ -28,7 +32,7 @@ int initActionList(char *fileName, struct ActionList **actionList){
     // Open fileName 
     ret = open(fileName, O_RDONLY);
     if (ret == -1)
-        return -4;
+        return IOErr;
     else
         fd = ret;
 
@@ -37,7 +41,7 @@ int initActionList(char *fileName, struct ActionList **actionList){
         // Read next line of file
         lineLen = readLine(fd, line, MAX_BYTELEN_BUFFER);
         if (lineLen == -1)
-            return -4;// indicates that there was read error
+            return IOErr;// indicates that there was read error
         else if (lineLen == -6)
             break;      // indicates that we are done reading from the file
         else if (lineLen == 0)
@@ -50,36 +54,36 @@ int initActionList(char *fileName, struct ActionList **actionList){
         // Scan the line into its parts
         ret = sscanf(line, "%s %s %s", actionTypeStr, paramTypeStr, paramStr);
         if (ret != 3)
-            return -4;  // indicates that something went wrong in IO
+            return ParseFileErr;  // indicates broken config file
 
         // Get the action type...
         ret = getActionType(actionTypeStr);
-        if (ret == -2)
-            return -4; // indicates that something went wrong in IO
+        if (ret == NullParamErr)
+            return ParseFileErr; // indicates broken config file
         else
             action_type = ret;
 
         // ... the param type... 
         ret = getParamType(paramTypeStr);
-        if (ret == -2)
-            return -4; // indicates that something went wrong in IO
+        if (ret == NullParamErr)
+            return ParseFileErr; // indicates broken config file
         else
             param_type = ret;
 
         // Create a new action
         ret = initAction(action_type, param_type, paramStr, &action);
-        if (ret == -2)
-            return -4; // indicates that something went wrong in IO
+        if (ret == NullParamErr)
+            return ParseFileErr; // indicates broken config file
 
         // Insert it into actionList
         ret = insertAction(&action, actionList);
         if (ret < 0)
-            return -4; // indicates that something went wrong in IO
+            return CodeErr; // indicates that something went wrong in programming this function...
     }
 
     // intuatively, the returned pointer should point to the head of the list
     *actionList = (*actionList)->head;
-    return 0;
+    return NoneErr;
 }
 
 
@@ -88,10 +92,12 @@ int insertAction(struct Action *action, struct ActionList **actionList){
 
     // Make sure that params aren't null
     if (actionList == NULL || action == NULL)
-        return -2;
+        return NullParamErr;
 
     // make space for newActionListItem
     newActionListItem = malloc(sizeof(struct ActionList));
+    if (newActionListItem == NULL)
+        return MemErr;
 
     // insert contents of new action
     memcpy(&newActionListItem->action, action, sizeof(struct Action));
@@ -123,7 +129,7 @@ int insertAction(struct Action *action, struct ActionList **actionList){
     // finally, set actionList to point to the newly inserted action.
     (*actionList) = newActionListItem;
 
-    return 0;
+    return NoneErr;
 }
 
 
@@ -131,11 +137,11 @@ int insertAction(struct Action *action, struct ActionList **actionList){
 int getAction(struct Action **retAction, struct ActionList **actionList){
     // Make sure that params aren't null
     if (actionList == NULL)
-        return -2;
+        return NullParamErr;
 
     ///// Set retAction to the action provided by the list
     (*retAction) = &((*actionList)->action);    
-    return 0;
+    return NoneErr;
 }
 
 
@@ -143,12 +149,12 @@ int getAction(struct Action **retAction, struct ActionList **actionList){
 int nextAction(struct ActionList **actionList){
     // Make sure that params aren't null
     if (actionList == NULL)
-        return -2;
+        return NullParamErr;
 
     ///// Simply update actionList to point to the next element.
     (*actionList) = (*actionList)->next;
 
-    return 0;
+    return NoneErr;
 }
 
 
@@ -159,9 +165,7 @@ int freeActionList(struct ActionList **actionList){
 
     // Make sure that params aren't null
     if (actionList == NULL)
-        return -2;
-
-
+        return NullParamErr;
 
     // Step through each actionListItem and free it
     struct ActionList *pal = *actionList;
@@ -175,5 +179,6 @@ int freeActionList(struct ActionList **actionList){
         free(ptrActionList);
     } while ( pal != *actionList );
     *actionList = NULL;
-    return 0;
+
+    return NoneErr;
 }

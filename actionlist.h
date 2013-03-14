@@ -48,16 +48,28 @@ struct ActionList{
 Description: Initialize actionList from the file provided in fileName. Assumes that
 the provided actionList item is established already.
 
+fileName: The config file to load from.
+actionList: The struct ActionList to be initialized, should not point to anything initially.
+
 Return: 0 upon success
+-3 if we run into a programming error
+-4 upon IO Error
+-7 if error while parsing file
 */
 int initActionList(char *fileName, struct ActionList **actionList);
 
 
 
 /*
-Description: Inserts the provided action into actionList.
+Description: Inserts the provided action into a struct ActionList. The actionList
+will append action immidiately after actionList, then update actionList to point 
+to the newly inserted action.
+
+action: The action to be inserted to the actionList.
+actionList: The actionList which will be modified.
 
 Return: 0 upon success
+-2 if incorrect parameters passed
 */
 int insertAction(struct Action *action, struct ActionList **actionList);
 

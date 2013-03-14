@@ -28,9 +28,9 @@ Return Values:
  0  SUCCESS!
 -1  Memory Err
 -2  Incorrect Parameter Passed
--3  XXX
+-3  Error that should never be reached, means that there is a program error
 -4  IO Error
 -5  Buffer provided was not large enough to fit content
 -6  End Of File
--7
+-7  Error while parsing file
 -8
