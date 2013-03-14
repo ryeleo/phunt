@@ -2,9 +2,12 @@
 // 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
 #include "action.h"
 #include "log.h"
+#include "util.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 // We must have a global log in order to takeAction().
 extern struct Log *log;
