@@ -39,8 +39,10 @@ errorCode: The error code to print.
 Return: A const char * to the string representing the error code,
 NULL if errorCode does not exist
 */
-const inline char *strError(int errorCode);
-const char *errorString[] = {
+char *strError(int errorCode);
+char *errorStrings[11];
+/* 
+= {
     "",
     "Memory Error; had an issue mallocing a block of memory.",
     "Null Pointer Parameter Error; there was a pointer passed as NULL when it needs to hold a value.",
@@ -50,13 +52,14 @@ const char *errorString[] = {
     "End of File Error; not really an error, just means that we reached the end of the file.", 
     "Parse File Error; had issues parsing a file, verify all input files to this program.",
     "Syscall Error; error occured when utalizing a system call.",
-    "Number Error; a number value was outside the realm of acceptable values."
-}
+    "Number Error; a number value was outside the realm of acceptable values.",
+    "C-Library Call Error; issue occured inside of one of the clib calls."
+};*/
 #define NoneErr          0
 #define MemErr          -1
 #define NullParamErr    -2
 #define CodeErr         -3
-#define IOError         -4
+#define IOErr           -4
 #define BufferSizeErr   -5
 #define EndOfFileErr    -6
 #define ParseFileErr    -7
