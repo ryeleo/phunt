@@ -1,5 +1,9 @@
 // 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
 // 2013 - James Ingalls <james.ingalls@gmail.com>
+#include "util.h"
+#include "log.h"
+#include "actionList.h"
+#include "action.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
