@@ -35,7 +35,7 @@ do{
 
 
 struct ActionList{
-    struct Action action;
+    struct Action action;   // The action that this node of the actionList contains
     struct ActionList 
         *next,  // points to the next actionList
         *prev,  // points to the prev actionList
@@ -52,6 +52,7 @@ fileName: The config file to load from.
 actionList: The struct ActionList to be initialized, should not point to anything initially.
 
 Return: 0 upon success
+-2 if a parameter passed was null
 -3 if we run into a programming error
 -4 upon IO Error
 -7 if error while parsing file
@@ -69,7 +70,8 @@ action: The action to be inserted to the actionList.
 actionList: The actionList which will be modified.
 
 Return: 0 upon success
--2 if incorrect parameters passed
+-1 if unable to malloc memory for actionList structure
+-2 if null parameters passed
 */
 int insertAction(struct Action *action, struct ActionList **actionList);
 
@@ -81,7 +83,12 @@ Description: Get the next action from the action list, without removing any elem
 from the list.
 NOTICE: We pass back a reference to the action, not a copy of it.
 
+retAction: A pointer which will point internal to the data structure to the
+action asked for.
+actionList: The actionList to be pulled from
+
 Return: 0 upon success,
+-2 if null parameters passed
 */
 int getAction(struct Action **retAction, struct ActionList **actionList);
 
@@ -91,7 +98,10 @@ int getAction(struct Action **retAction, struct ActionList **actionList);
 Description: Simply updates this actionList to point at the next action in the
 list. This should generally be called in juncture with getAction().
 
-Return: 0 upon success
+actionList: The actionList which will be updated to point to the next element in the List.
+
+Return: 0 upon success,
+-2 if null parameters passed
 */
 int nextAction(struct ActionList **actionList);
 
@@ -100,7 +110,10 @@ Description: Free all elements from actionList which were inserted using the
 insertAction method. This should be called when we are done using actionList,
 and will result in actionList being a NULL pointer.
 
-Return:
+actionList: the actionList to be freed.
+
+Return: 0 upon success,
+-2 if null parameter
 */
 int freeActionList(struct ActionList **actionList);
 

@@ -1,5 +1,6 @@
 // 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
 #include "log.h"
+#include "util.h"
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
@@ -12,7 +13,7 @@ int initLog(char *fileName, char *prefixMessage, struct Log *log){
 
     // Verify passed parameters
     if (log == NULL || fileName == NULL || prefixMessage == NULL)
-        return -2;
+        return NullParamErr;
 
     ///// Copy fileName to log->fileName
     strncpy(log->fileName, fileName, MAX_STRLEN_FILENAME);
@@ -28,11 +29,11 @@ int initLog(char *fileName, char *prefixMessage, struct Log *log){
     ret = open(fileName, O_RDWR | O_APPEND | O_CREAT, 
             S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (ret == -1)
-        return -4;
+        return IOErr;
     else
         log->log_fd = ret;
 
-    return 0;
+    return NoneErr;
 }
 
 
@@ -42,12 +43,12 @@ int closeLog(struct Log *log){
 
     // Verify passed parameters
     if (log == NULL)
-        return -2;
+        return NullParamErr;
 
     ///// Close log file
     ret = close(log->log_fd);
     if (ret == -1)
-        return -4;
+        return IOErr;
 
     return 0;
 }
@@ -63,7 +64,7 @@ int writeMessage(char *message, struct Log *log){
 
     // Verify passed parameters
     if (message == NULL || log == NULL)
-        return -2;
+        return NullParamErr;
 
     ///// Get time 
     // Get the time that this message will be recorded to be logged at
@@ -73,7 +74,7 @@ int writeMessage(char *message, struct Log *log){
             1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
     strTime[MAX_STRLEN_TIME-1] = '\0';
     if (ret < 0)
-        return -1;
+        return CLibCallErr;
 
 
     ///// Compile the logMessage (time + prefix + ": " + message)
@@ -82,12 +83,12 @@ int writeMessage(char *message, struct Log *log){
     logMessage[MAX_STRLEN_LOGMESSAGE-2] = '\n'; // Assures that even in the worst case we still
     logMessage[MAX_STRLEN_LOGMESSAGE-1] = '\0'; // are safe with string manipulation
     if (ret < 0)
-        return -1;
+        return CLibCallErr;
 
     
     ///// print the logMessage to file
     ret = write(log->log_fd, logMessage, strlen(logMessage));
     if (ret == -1)
-        return -4;
-    return 0;
+        return IOErr;
+    return NoneErr;
 }

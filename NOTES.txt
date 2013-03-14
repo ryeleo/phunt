@@ -33,4 +33,4 @@ Return Values:
 -5  Buffer provided was not large enough to fit content
 -6  End Of File
 -7  Error while parsing file
--8
+-8  

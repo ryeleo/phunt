@@ -34,7 +34,7 @@ represents the message the error code is trying to print. See the defines below
 the function decleration to see valid errorCodes, as well as the printed
 strings.
 
-errorCode: The error code to print
+errorCode: The error code to print.
 
 Return: A const char * to the string representing the error code,
 NULL if errorCode does not exist
@@ -42,14 +42,27 @@ NULL if errorCode does not exist
 const inline char *strError(int errorCode);
 const char *errorString[] = {
     "",
-    "IO Error has occured, verify all file descriptors",
+    "Memory Error; had an issue mallocing a block of memory.",
+    "Null Pointer Parameter Error; there was a pointer passed as NULL when it needs to hold a value.",
+    "Code Error; XXX this should never happen, soz.",
+    "IO Error; verify file descriptors and calls to read/write/open/close.",
+    "Buffer Size Error; a buffer of insufficiant size was provided.",
+    "End of File Error; not really an error, just means that we reached the end of the file.", 
+    "Parse File Error; had issues parsing a file, verify all input files to this program.",
+    "Syscall Error; error occured when utalizing a system call.",
+    "Number Error; a number value was outside the realm of acceptable values."
 }
-#define NoneErr
-#define MemErr -1
-#define NullParamErr -2
-#define CodeErr -3
-#define IOError -4
-#define 
+#define NoneErr          0
+#define MemErr          -1
+#define NullParamErr    -2
+#define CodeErr         -3
+#define IOError         -4
+#define BufferSizeErr   -5
+#define EndOfFileErr    -6
+#define ParseFileErr    -7
+#define SyscallErr      -8
+#define NumErr          -9
+#define CLibCallErr     -10
 
 #define MAX_STRLEN_ERROR 256
 
