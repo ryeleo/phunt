@@ -32,17 +32,22 @@ int readLine(int fd, char *retLine, int retLineLength){
     return bytesInLine;
 }
 
-
-
-const char *strError(int errorCode){
+char *errorStrings[11] = {
+    "",
+    "Memory Error; had an issue mallocing a block of memory.",
+    "Null Pointer Parameter Error; there was a pointer passed as NULL when it needs to hold a value.",
+    "Code Error; XXX this should never happen, soz.",
+    "IO Error; verify file descriptors and calls to read/write/open/close.",
+    "Buffer Size Error; a buffer of insufficiant size was provided.",
+    "End of File Error; not really an error, just means that we reached the end of the file.", 
+    "Parse File Error; had issues parsing a file, verify all input files to this program.",
+    "Syscall Error; error occured when utalizing a system call.",
+    "Number Error; a number value was outside the realm of acceptable values.",
+    "C-Library Call Error; issue occured inside of one of the clib calls."
+};
+char *strError(int errorCode){
     char *errString = NULL;
-    switch(errorCode){
-        case IOError:
-            errString = errorStrings[-IOErr];
-            break;
-        case IOError:
-        default:
-            break;
-    }
+    if (errorCode <= 0 && errorCode >= -10)
+        errString = errorStrings[-errorCode];
     return errString;
 }

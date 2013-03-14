@@ -10,7 +10,7 @@ int main(int argc, char **argv){
     char *fileName = "./testFiles/testutil.txt";
     char line[LINE_LENGTH];
 
-    int ret, fd;
+    int i, ret, fd;
 
     printf("===\nRunning Test Set for util.c.\n===\n\n");
 
@@ -52,6 +52,12 @@ int main(int argc, char **argv){
     ret = readLine(fd, line, LINE_LENGTH);
     printf("ret = %d\n", ret);
     printf("line = %s\n", line);
+
+
+    printf("Some Strerror testing.\n");
+    for (i = 0 ; i >= -10 ; i--)
+        printf("%s\n", strError(i));
+
 
     return 0;
 }
