@@ -66,8 +66,27 @@ int takeAction(struct Action *action){
     ///// Get snapshot of what we need in /proc that matches our criteria specified in action->param
     switch(action->paramType){
         case pt_user:
+            switch(action->actionType){
+                case at_nice:
+                    ret = setpriority(PRIO_USER, parameter, -20);   //nice all of user by uid (paramater)
+                    if (ret == -1)  // if setpriority failed
+                        return SyscallErr; 
+                    break;
+                case at_kill:
+
+                    break;
+                case at_susp:
+
+                    break;
+
+                default:
+                    return -2;
+
+            }
+
+
             break;
-        case pt_mem:
+        case pt_mem:    //crawl the /proc filesytem and read the memory values, then take action.
             break;
         case pt_path:
             break;
@@ -76,7 +95,7 @@ int takeAction(struct Action *action){
     }
 
 
-    ///// Either nice() or kill() process depending on what is required
+    ///// Either nice() or kill() process depending on ActionType
 
     return 0;
 }
