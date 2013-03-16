@@ -47,6 +47,7 @@ int initAction(action_t at, param_t pt, char *param, struct Action *action){
             break;
         case pt_mem:
             ret = sscanf(param, "%d", &(action->param.memoryCap));
+            action->param.memoryCap = action->param.memoryCap * 1024;   //get the memory cap in kB
             if (ret != 1 || action->param.memoryCap < 0) // if we did not have a good param
                 return -2;
             break;
@@ -68,11 +69,15 @@ int actionToLog(char *out, struct Action *action){
 int takeAction(struct Action *action){
     int i = 2,  // index of pid
         ret,    
-        fd;
+        fd,
+        procUid,
+        ProcVmRSS;
     DIR *curDir;
     char pidDirName[MAX_STRLEN_FILENAME];
     char pidStatDirName[MAX_STRLEN_FILENAME];
     char line[MAX_STRLEN_LINE];
+
+
 
 // We want to take care of the user nice case outside of the loop because we can do that with setpriority()
     if (action->paramType == pt_nice && action->actionType == at_nice){       //nice all processes owned by a user
@@ -149,10 +154,16 @@ int takeAction(struct Action *action){
                                 // return SyscallErr; 
                             // break;
                         case at_kill:       //kill all processes owned by a user
-        
+                            ret = kill(i, SIGKILL);
+                            if(ret == -1)
+                                return SyscallErr
                             break;
+
                         case at_susp:       //suspend all processes owned by the user
-        
+                            ret = kill(i, SIGSTOP);
+                            if(ret == -1)
+                                return SyscallErr
+                        
                             break;
         
                         default:
@@ -165,22 +176,64 @@ int takeAction(struct Action *action){
     
                 break;
             case pt_mem:    //crawl the /proc filesytem and read the memory values, then take action.
-            
+                //get the actual location of status file of process with PID = i 
+                ret = snprintf(pidStatDirName,"/proc/%d/%s", i, "status" );
+                if (ret < 0)
+                    return CLibCallErr;
+
+                // 
+                ret = open(pidStatDirName);
+                if (ret == -1)
+                    return IOErr;
+                else
+                    fd = ret;
+
+                // walk through the status file until we find the line that starts with "Uid:"
+                while(1){
+                    ret = readline(fd, line, MAX_STRLEN_LINE);
+                    if (ret < 0)
+                        return IOErr;
+                    ret = sscanf( line , "VmRSS: %d kB", procVmRSS )
+                    if ( ret != 1 ) // This means that we did NOT find the line
+                        continue;
+                    else    // If we did find the correct line, the procUid from proc/i/status will be loaded into procUid
+                        break;
+                }
+
+                // clear up system resources used in opening the file
+                ret = close(fd);
+                if (ret == -1)
+                    return IOErr;
+
+
+
+
                 switch(action->actionType){
                     case at_nice:       //nice all processes below a certain memory capacity
-                        ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (paramater)
-                        if (ret == -1)  // if setpriority failed
-                            return SyscallErr; 
+                        
+                        if (procVmRSS <= action->param.memoryCap){
+
+                            ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (paramater)
+                            if (ret == -1)  // if setpriority failed
+                                return SyscallErr; 
+                        }
+
                         break;
                     case at_kill:       //kill all processes above a certain memory capacity
-                        ret = kill(i, SIGKILL);
-                        if(ret == -1)
-                            return SyscallErr
+                        
+                        if (procVmRSS > action->param.memoryCap){
+                            ret = kill(i, SIGKILL);
+                            if(ret == -1)
+                                return SyscallErr
+                        }
                         break;
                     case at_susp:       //suspend all processes above a certain memory capacity
-                        ret = kill(i, SIGSTOP);
-                        if(ret == -1)
-                            return SyscallErr
+                        
+                        if (procVmRSS > action->param.memoryCap){
+                            ret = kill(i, SIGSTOP);
+                            if(ret == -1)
+                                return SyscallErr
+                        }
                         break;
         
                     default:

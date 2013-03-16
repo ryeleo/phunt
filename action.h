@@ -42,7 +42,7 @@ extern const char *paramStrings[3];
 typedef union{
     char *pathName;
     int uid;
-    int memoryCap;  // in KB
+    int memoryCap;  // in kB
 } Parameter;
 
 struct Action{
