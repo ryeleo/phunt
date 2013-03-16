@@ -1,4 +1,6 @@
 // 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
+// 2013 - James Ingalls <james.ingalls@gmail.com>
+
 #include "util.h"
 #include <stdlib.h>
 #include <unistd.h>

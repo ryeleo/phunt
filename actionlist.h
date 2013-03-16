@@ -1,4 +1,5 @@
 // 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
+// 2013 - James Ingalls <james.ingalls@gmail.com>
 /* 
 ActionList offers a way to load from a predefined .conf file with the format
 following the structure of this example:
