@@ -71,12 +71,13 @@ int takeAction(struct Action *action){
         ret,    
         fd,
         procUid,
-        ProcVmRSS;
+        procVmRSS;
     DIR *curDir;
     char pidDirName[MAX_STRLEN_FILENAME];
     char pidStatDirName[MAX_STRLEN_FILENAME];
     char line[MAX_STRLEN_LINE];
-
+    char procCWD[MAX_STRLEN_FILENAME];
+    char pidCWDDirName[MAX_STRLEN_FILENAME];
 
 
 // We want to take care of the user nice case outside of the loop because we can do that with setpriority()
@@ -98,7 +99,6 @@ int takeAction(struct Action *action){
             curDir = opendir(pidDirName);   //get proc/pid
             if (curDir == NULL){            //no directory of that number
                 if (ENOENT == errno){
-                    i++;
                     continue;
                 }else
                     return IOErr;
@@ -106,6 +106,7 @@ int takeAction(struct Action *action){
                 ret = closedir(pidDirName); //Close the directory cause we don't need it open
                 if (ret == -1)
                     return IOErr;   //if we couldn't close the directory
+                i++;
                 break;
 
         }
@@ -213,7 +214,7 @@ int takeAction(struct Action *action){
                         
                         if (procVmRSS <= action->param.memoryCap){
 
-                            ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (paramater)
+                            ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
                             if (ret == -1)  // if setpriority failed
                                 return SyscallErr; 
                         }
@@ -246,10 +247,18 @@ int takeAction(struct Action *action){
     
                 break;
             case pt_path:
-                if(){      //if current working directory of pidDirName is action->param.pathName  
+                ret = snprintf(pidCWDDirName,"/proc/%d/%s", i, "cwd" );
+                if (ret < 0)
+                    return CLibCallErr;
+
+                ret = readlink(pidCWDDirName, procCWD, MAX_STRLEN_FILENAME )
+                if (ret < 0 )
+                    return CLibCallErr;
+
+                if(strncmp(procCWD, action->param.pathName, MAX_STRLEN_FILENAME) == 0){      //if current working directory of pidDirName is action->param.pathName  
                     switch(action->actionType){
                         case at_nice:       //nice all processes in a particular current working directory
-                            ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (paramater)
+                            ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
                             if (ret == -1)  // if setpriority failed
                                 return SyscallErr; 
                             break;
