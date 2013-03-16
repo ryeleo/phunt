@@ -67,6 +67,6 @@ char *errorStrings[11];
 #define NumErr          -9
 #define CLibCallErr     -10
 
-#define MAX_STRLEN_ERROR 256
-
+#define MAX_STRLEN_ERROR    256
+#define PID_MAX             32768
 #endif//__UTIL_H__
