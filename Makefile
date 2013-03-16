@@ -22,7 +22,7 @@ debug: CFLAGS += $(DEBUG)
 debug: default
 
 phunt: phunt.c
-	$(CC) phunt.c $(CFLAGS) -o $(PROJECTDIR)/phunt
+	$(CC) phunt.c actionlist.c action.c util.c log.c $(CFLAGS) -o $(PROJECTDIR)/phunt
 
 clean:
 	rm -f *.o

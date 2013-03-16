@@ -2,7 +2,7 @@
 // 2013 - James Ingalls <james.ingalls@gmail.com>
 #include "util.h"
 #include "log.h"
-#include "actionList.h"
+#include "actionlist.h"
 #include "action.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -16,7 +16,9 @@ extern struct Log *log;
 /*
 Description: Macro for printing errors IN THE MAIN METHOD ONLY
 */
-#define printError(errorCode) do( printf("Error: %s -- %s:%d\n    Message:", __FILE__, __func__, __LINE__, strError(errorCode)); )while{0};
+#define printError(errorCode) do{               \
+    printf("Error: %s -- %s:%d\n    Message: %s", __FILE__, __func__, __LINE__, strError(errorCode));  \
+}while(0)
 
 /*
 Description: Prints the usage to user.
@@ -41,12 +43,13 @@ int main(int argc, char **argv){
 
     char
         logFileName[MAX_OPT_LEN] = "/var/log/phunt.log",    // Filename of log to append to while running this process
-        configFileName[MAX_OPT_LEN] = "/etc/phunt.conf";    // Filename of configuration for running this process
+        configFileName[MAX_OPT_LEN] = "/etc/phunt.conf",    // Filename of configuration for running this process
+        *logPrefix = "phunt";
 
     struct Action *action;  // An action pointer used when interacting with the actionList
 
     struct ActionList 
-        *actionList         // The main actionList
+        *actionList,        // The main actionList
         *actionList_iter;   // Iterator for the main actionList
 
     struct Log phunt_log;   // The log structure for the phunt process
@@ -90,7 +93,7 @@ int main(int argc, char **argv){
         exit(0);
     }
     // initializt the log 
-    ret = initLog(fileName[0], prefix[0], log);
+    ret = initLog(logFileName, logPrefix, log);
     if (ret < 0){
         printError(ret);
         exit(0);
@@ -113,7 +116,7 @@ int main(int argc, char **argv){
         actionList_iter = actionList;
         do{
             ///// Get the next action in the list
-            ret = getAction(&p_action, &actionList_iter);
+            ret = getAction(&action, &actionList_iter);
             if (ret < 0){
                 printError(ret);
                 exit(0);
@@ -126,7 +129,7 @@ int main(int argc, char **argv){
             }
 
             ///// fulfil the next action
-            ret = takeAction(p_action);
+            ret = takeAction(action);
             if (ret < 0){
                 printError(ret);
                 exit(0);
@@ -138,7 +141,7 @@ int main(int argc, char **argv){
 
     ///// Clear up all resources used
     // clear memory from actionList
-    ret = freeActionList(&p_actionList);
+    ret = freeActionList(&actionList_iter);
     if (ret < 0){
         printError(ret);
     }
