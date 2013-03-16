@@ -66,10 +66,13 @@ int actionToLog(char *out, struct Action *action){
 
 
 int takeAction(struct Action *action){
-    int i = 2, ret;
+    int i = 2,  // index of pid
+        ret,    
+        fd;
     DIR *curDir;
     char pidDirName[MAX_STRLEN_FILENAME];
     char pidStatDirName[MAX_STRLEN_FILENAME];
+    char line[MAX_STRLEN_LINE];
 
 // We want to take care of the user nice case outside of the loop because we can do that with setpriority()
     if (action->paramType == pt_nice && action->actionType == at_nice){       //nice all processes owned by a user
@@ -81,14 +84,14 @@ int takeAction(struct Action *action){
     }
 
 
-    while(){        //until looked at every numbered directory not beginning with '0' in /proc 
+    while(i < PID_MAX){        //until looked at every numbered directory not beginning with '0' in /proc 
         for (; i<PID_MAX; i++) {
 
             ret = snprintf(pidDirName,"/proc/%d", i );
             if (ret < 0)
                 return CLibCallErr;
-            curDir = opendir(pidDirName);        //get proc/pid
-            if (curDir == NULL){        //no directory of that number
+            curDir = opendir(pidDirName);   //get proc/pid
+            if (curDir == NULL){            //no directory of that number
                 if (ENOENT == errno){
                     i++;
                     continue;
@@ -106,15 +109,38 @@ int takeAction(struct Action *action){
 
         switch(action->paramType){
             case pt_user:
+
                 //get the actual location of status file of process with PID = i 
-                ret = snprintf(pidStatDirName,"/proc/%d/%s",i, "status" );
+                ret = snprintf(pidStatDirName,"/proc/%d/%s", i, "status" );
                 if (ret < 0)
                     return CLibCallErr;
+
+                // 
                 ret = open(pidStatDirName);
                 if (ret == -1)
                     return IOErr;
+                else
+                    fd = ret;
 
-                if(){
+                // walk through the status file until we find the line that starts with "Uid:"
+                while(1){
+                    ret = readline(fd, line, MAX_STRLEN_LINE);
+                    if (ret < 0)
+                        return IOErr;
+                    ret = sscanf( line , "Uid: %d %*d %*d %*d", procUid )
+                    if ( ret != 1 ) // This means that we did NOT find the line
+                        continue;
+                    else    // If we did find the correct line, the procUid from proc/i/status will be loaded into procUid
+                        break;
+                }
+
+                // clear up system resources used in opening the file
+                ret = close(fd);
+                if (ret == -1)
+                    return IOErr;
+
+                // check if the procUid from the /proc/i/status file matches the action's param.uid
+                if(action->param.uid == procUid){
                     switch(action->actionType){
                         // This should be taken care of before we iterate over proc, otherwise if we have a user nice case we would be setting the priority every time we look at any process
                         // case at_nice:       //nice all processes owned by a user

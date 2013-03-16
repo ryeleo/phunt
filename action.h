@@ -17,6 +17,8 @@ The actions that can be taken on the above stated items are:
 #define __ACTION_H__
 
 #define MAX_STRLEN_FILENAME 256
+#define MAX_STRLEN_LINE     1024
+#define PID_MAX             32768
 
 
 // Defines the types of actions that can be taken
