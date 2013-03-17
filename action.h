@@ -1,5 +1,5 @@
-/* 2013 - Ryan Leonard <ryan.leonard71@gmail.com>
-   2013 - James Ingalls <james.ingalls@gmail.com>
+/*  2013 - James Ingalls <james.ingalls@gmail.com>
+    2013 - Ryan Leonard <ryan.leonard71@gmail.com>
 action.c provides an implmentation of a process manager based on the /proc/ 
 filesystem. This is also based on the idea of taking an "action" on a subset of
 processes that have a certain "attribute." The attributes are currently as
@@ -76,17 +76,10 @@ int actionLoop(int fd);
 
 /*
 Description: Given an action, enforce that action.
-Note: We have to keep this method as low overhead as possible. This should also 
-be reflected in any methods that takeAction calls.
 
-Additionally, to 
-enforce that we never reach an accidental infinite loop, get a snapshot of the 
-/proc/ filesystem
-takeAction will be very regularly called so assuring that there is greatest
-efficiancy here is of interest. This function will have to look at the /proc
+This function will have to look at the /proc
 filesystem every time it runs.
--Is there any way to have this set-up with persistant open filedescriptors with
-RO Access
+
 
 Return: -6 upon invalid parameter passed
 */
