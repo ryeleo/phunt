@@ -3,10 +3,15 @@
 #include "action.h"
 #include "log.h"
 #include "util.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <dirent.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <sys/resource.h>
 #include <signal.h>
 
@@ -81,7 +86,7 @@ int takeAction(struct Action *action){
 
 
 // We want to take care of the user nice case outside of the loop because we can do that with setpriority()
-    if (action->paramType == pt_nice && action->actionType == at_nice){       //nice all processes owned by a user
+    if (action->paramType == pt_user && action->actionType == at_nice){       //nice all processes owned by a user
         ret = setpriority(PRIO_USER, action->param.uid, -20);   //nice all of user by uid (param)
         if (ret == -1)  // if setpriority failed
             return SyscallErr; 
@@ -91,38 +96,43 @@ int takeAction(struct Action *action){
 
 
     while(i < PID_MAX){        //until looked at every numbered directory not beginning with '0' in /proc 
+        // walk through the /proc file structure until we find a valid pid
         for (; i<PID_MAX; i++) {
 
-            ret = snprintf(pidDirName,"/proc/%d", i );
+            // put together the full path for a pid
+            ret = snprintf(pidDirName, MAX_STRLEN_FILENAME, "/proc/%d", i);
             if (ret < 0)
                 return CLibCallErr;
+
             curDir = opendir(pidDirName);   //get proc/pid
+
             if (curDir == NULL){            //no directory of that number
-                if (ENOENT == errno){
+                if (ENOENT == errno)
                     continue;
-                }else
+                else
                     return IOErr;
-            }else
-                ret = closedir(pidDirName); //Close the directory cause we don't need it open
+            }else{  // There is a pid 'i'!
+                ret = closedir(curDir); //Close the directory cause we don't need it open
                 if (ret == -1)
                     return IOErr;   //if we couldn't close the directory
                 i++;
+#ifdef DEBUG
+                printf("Pid Path Chosen:    %s\n", pidDirName);
+#endif//DEBUG
                 break;
-
+            }
         }
-
-
 
         switch(action->paramType){
             case pt_user:
 
                 //get the actual location of status file of process with PID = i 
-                ret = snprintf(pidStatDirName,"/proc/%d/%s", i, "status" );
+                ret = snprintf(pidStatDirName, MAX_STRLEN_FILENAME, "/proc/%d/%s", i, "status" );
                 if (ret < 0)
                     return CLibCallErr;
 
-                // 
-                ret = open(pidStatDirName);
+                // open the status file
+                ret = open(pidStatDirName, O_RDONLY);
                 if (ret == -1)
                     return IOErr;
                 else
@@ -130,46 +140,44 @@ int takeAction(struct Action *action){
 
                 // walk through the status file until we find the line that starts with "Uid:"
                 while(1){
-                    ret = readline(fd, line, MAX_STRLEN_LINE);
+                    ret = readLine(fd, line, MAX_STRLEN_LINE);
                     if (ret < 0)
                         return IOErr;
-                    ret = sscanf( line , "Uid: %d %*d %*d %*d", procUid )
+                    ret = sscanf( line , "Uid: %d %*d %*d %*d", &procUid);
                     if ( ret != 1 ) // This means that we did NOT find the line
                         continue;
-                    else    // If we did find the correct line, the procUid from proc/i/status will be loaded into procUid
+                    else{    // If we did find the correct line, the procUid from proc/i/status will be loaded into procUid
                         break;
+                    }
                 }
 
                 // clear up system resources used in opening the file
                 ret = close(fd);
                 if (ret == -1)
                     return IOErr;
-
+#ifdef DEBUG
+                printf("UID:        %d\n", procUid);
+                printf("Action_UID: %d\n", action->param.uid);
+#endif//DEBUG
                 // check if the procUid from the /proc/i/status file matches the action's param.uid
                 if(action->param.uid == procUid){
                     switch(action->actionType){
                         // This should be taken care of before we iterate over proc, otherwise if we have a user nice case we would be setting the priority every time we look at any process
-                        // case at_nice:       //nice all processes owned by a user
-                            // ret = setpriority(PRIO_USER, parameter, -20);   //nice all of user by uid (parameter)
-                            // if (ret == -1)  // if setpriority failed
-                                // return SyscallErr; 
-                            // break;
+                        // case at_nice:    //nice all processes owned by a user
                         case at_kill:       //kill all processes owned by a user
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
-                                return SyscallErr
+                                return SyscallErr;
                             break;
 
                         case at_susp:       //suspend all processes owned by the user
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
-                                return SyscallErr
-                        
+                                return SyscallErr;
                             break;
-        
+
                         default:
                             return -2;
-        
                     }
                 }else
                     continue;
@@ -178,12 +186,12 @@ int takeAction(struct Action *action){
                 break;
             case pt_mem:    //crawl the /proc filesytem and read the memory values, then take action.
                 //get the actual location of status file of process with PID = i 
-                ret = snprintf(pidStatDirName,"/proc/%d/%s", i, "status" );
+                ret = snprintf(pidStatDirName, MAX_STRLEN_FILENAME, "/proc/%d/%s", i, "status" );
                 if (ret < 0)
                     return CLibCallErr;
 
                 // 
-                ret = open(pidStatDirName);
+                ret = open(pidStatDirName, O_RDONLY);
                 if (ret == -1)
                     return IOErr;
                 else
@@ -191,10 +199,10 @@ int takeAction(struct Action *action){
 
                 // walk through the status file until we find the line that starts with "Uid:"
                 while(1){
-                    ret = readline(fd, line, MAX_STRLEN_LINE);
+                    ret = readLine(fd, line, MAX_STRLEN_LINE);
                     if (ret < 0)
                         return IOErr;
-                    ret = sscanf( line , "VmRSS: %d kB", procVmRSS )
+                    ret = sscanf(line, "VmRSS: %d kB", &procVmRSS);
                     if ( ret != 1 ) // This means that we did NOT find the line
                         continue;
                     else    // If we did find the correct line, the procUid from proc/i/status will be loaded into procUid
@@ -205,9 +213,10 @@ int takeAction(struct Action *action){
                 ret = close(fd);
                 if (ret == -1)
                     return IOErr;
-
-
-
+#ifdef DEBUG
+                printf("VmRSS:        %d\n", procVmRSS);
+                printf("Action_Mem:   %d\n", action->param.memoryCap);
+#endif//DEBUG
 
                 switch(action->actionType){
                     case at_nice:       //nice all processes below a certain memory capacity
@@ -225,7 +234,7 @@ int takeAction(struct Action *action){
                         if (procVmRSS > action->param.memoryCap){
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
-                                return SyscallErr
+                                return SyscallErr;
                         }
                         break;
                     case at_susp:       //suspend all processes above a certain memory capacity
@@ -233,7 +242,7 @@ int takeAction(struct Action *action){
                         if (procVmRSS > action->param.memoryCap){
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
-                                return SyscallErr
+                                return SyscallErr;
                         }
                         break;
         
@@ -247,13 +256,17 @@ int takeAction(struct Action *action){
     
                 break;
             case pt_path:
-                ret = snprintf(pidCWDDirName,"/proc/%d/%s", i, "cwd" );
+                ret = snprintf(pidCWDDirName, MAX_STRLEN_FILENAME, "/proc/%d/%s", i, "cwd" );
                 if (ret < 0)
                     return CLibCallErr;
 
-                ret = readlink(pidCWDDirName, procCWD, MAX_STRLEN_FILENAME )
+                ret = readlink(pidCWDDirName, procCWD, MAX_STRLEN_FILENAME );
                 if (ret < 0 )
                     return CLibCallErr;
+#ifdef DEBUG
+                printf("CWS:          %s\n", procCWD);
+                printf("Action_CWD:   %s\n", action->param.pathName);
+#endif//DEBUG
 
                 if(strncmp(procCWD, action->param.pathName, MAX_STRLEN_FILENAME) == 0){      //if current working directory of pidDirName is action->param.pathName  
                     switch(action->actionType){
@@ -265,12 +278,12 @@ int takeAction(struct Action *action){
                         case at_kill:       //kill all processes in a particular current working directory
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
-                                return SyscallErr
+                                return SyscallErr;
                             break;
                         case at_susp:       //suspend all processes in a particular current working directory
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
-                                return SyscallErr
+                                return SyscallErr;
                             break;
             
                         default:
@@ -279,9 +292,6 @@ int takeAction(struct Action *action){
                     }
                 }else
                     continue;
-                        
-    
-    
     
                 break;
             default:

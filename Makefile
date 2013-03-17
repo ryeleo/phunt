@@ -19,7 +19,7 @@ test_actionlist:
 	$(CC) test_actionlist.c actionlist.c util.c action.c $(CFLAGS) -g -DDEBUG -o $(PROJECTDIR)/test_actionlist
 
 debug: CFLAGS += $(DEBUG)
-debug: default
+debug: test_action
 
 phunt: phunt.c
 	$(CC) phunt.c actionlist.c action.c util.c log.c $(CFLAGS) -o $(PROJECTDIR)/phunt
