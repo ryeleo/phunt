@@ -53,10 +53,11 @@ struct Action{
 
 /*
 This will simply initialize all of the fields in the action struct.
-//XXX To map users to UID, use /etc/passwd
 
 type: The type of action which will be taken.
 param: Depending on the type, this will be parsed accordingly.
+action: The action to be initialized
+
 Return: 0 upon success, -6 upon invalid parameter passed
 */
 int initAction(action_t at, param_t pt, char *param, struct Action *action);
