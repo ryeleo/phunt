@@ -85,14 +85,15 @@ int takeAction(struct Action *action){
     char pidCWDDirName[MAX_STRLEN_FILENAME];
 
 
-// We want to take care of the user nice case outside of the loop because we can do that with setpriority()
-    if (action->paramType == pt_user && action->actionType == at_nice){       //nice all processes owned by a user
-        ret = setpriority(PRIO_USER, action->param.uid, -20);   //nice all of user by uid (param)
-        if (ret == -1)  // if setpriority failed
-            return SyscallErr; 
-        else 
-            return 0;
-    }
+    //We were going to take care of the user nice with setpriority() since setpriority handles that, but it would inhibit logging, so it needs to be done like the other cases.
+//  //We want to take care of the user nice case outside of the loop because we can do that with setpriority()
+    // if (action->paramType == pt_user && action->actionType == at_nice){       //nice all processes owned by a user
+        // ret = setpriority(PRIO_USER, action->param.uid, -20);   //nice all of user by uid (param)
+        // if (ret == -1)  // if setpriority failed
+            // return SyscallErr; 
+        // else 
+            // return 0;
+    // }
 
     // we actually initialize the value of i to 1 below
     i = 0;
