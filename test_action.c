@@ -22,19 +22,19 @@ int main(int argc, char **argv){
     printf("Testing initialization of actions...\n");
     // test initAction
     initAction(at_nice, pt_mem,     "128", &nice_mem_action);
-    initAction(at_nice, pt_user,    "User433", &nice_usr_action);
+    initAction(at_nice, pt_user,    "ryan", &nice_usr_action);
     initAction(at_nice, pt_path,    "/tmp/testing", &nice_pth_action);
     initAction(at_kill, pt_mem,     "400", &kill_mem_action);
-    initAction(at_kill, pt_user,    "mal", &kill_usr_action);
+    initAction(at_kill, pt_user,    "ryan", &kill_usr_action);
     initAction(at_kill, pt_path,    "/tmp/testing", &kill_pth_action);
     initAction(at_susp, pt_mem,     "300", &susp_mem_action);
-    initAction(at_susp, pt_user,    "mal", &susp_usr_action);
+    initAction(at_susp, pt_user,    "ryan", &susp_usr_action);
     initAction(at_susp, pt_path,    "/tmp/testing", &susp_pth_action);
 
     // print one of each action for sanity check
-    printf("actionType: %d paramType: %d param: %d\n", nice_mem_action.actionType, nice_mem_action.paramType, nice_mem_action.param.memoryCap);
     printf("actionType: %d paramType: %d param: %d\n", kill_usr_action.actionType, kill_usr_action.paramType, kill_usr_action.param.uid);
     printf("actionType: %d paramType: %d param: %s\n", susp_pth_action.actionType, susp_pth_action.paramType, susp_pth_action.param.pathName);
+    printf("actionType: %d paramType: %d param: %d\n", nice_mem_action.actionType, nice_mem_action.paramType, nice_mem_action.param.memoryCap);
     printf("Done with initialization of actions...\n");
 
 
@@ -42,6 +42,7 @@ int main(int argc, char **argv){
     // test take action
     printf("Testing taking of actions...\n");
     takeAction(&nice_mem_action);
+    /*
     takeAction(&nice_usr_action);
     takeAction(&nice_pth_action);
     takeAction(&kill_mem_action);
@@ -50,6 +51,7 @@ int main(int argc, char **argv){
     takeAction(&susp_mem_action);
     takeAction(&susp_usr_action);
     takeAction(&susp_pth_action);
+    */
     printf("Done taking of actions...\n");
     
 

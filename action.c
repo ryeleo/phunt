@@ -72,7 +72,7 @@ int actionToLog(char *out, struct Action *action){
 
 
 int takeAction(struct Action *action){
-    int i = 2,  // index of pid
+    int i,  // index of pid
         ret,    
         fd,
         procUid,
@@ -94,9 +94,11 @@ int takeAction(struct Action *action){
             return 0;
     }
 
-
+    // we actually initialize the value of i to 1 below
+    i = 0;
     while(i < PID_MAX){        //until looked at every numbered directory not beginning with '0' in /proc 
         // walk through the /proc file structure until we find a valid pid
+        i++;
         for (; i<PID_MAX; i++) {
 
             // put together the full path for a pid
@@ -115,7 +117,6 @@ int takeAction(struct Action *action){
                 ret = closedir(curDir); //Close the directory cause we don't need it open
                 if (ret == -1)
                     return IOErr;   //if we couldn't close the directory
-                i++;
 #ifdef DEBUG
                 printf("Pid Path Chosen:    %s\n", pidDirName);
 #endif//DEBUG
