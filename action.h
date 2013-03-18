@@ -20,6 +20,8 @@ The actions that can be taken on the above stated items are:
 #define MAX_STRLEN_LINE     1024
 #define PID_MAX             32768
 
+extern struct Log *log;
+
 
 // Defines the types of actions that can be taken
 typedef short  action_t;

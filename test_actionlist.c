@@ -18,7 +18,7 @@ int main(int argc, char **argv){
     // Test how parsing a config file goes
     ret = initActionList(fileName[0], &p_actionList);
     if (ret < 0)
-        printf("motherfuckin issues!");
+        printf("motherfuckin issues!\n");
 
     // Print all of the actions in the ActionList
     // Notice that this is the general way to iterate through the list
@@ -27,11 +27,11 @@ int main(int argc, char **argv){
     do{
         ret = getAction(&p_action, &pal);
         if (ret < 0)
-            printf("motherfuckin issues!");
+            printf("motherfuckin issues!\n");
 
         ret = nextAction(&pal);
         if (ret < 0)
-            printf("motherfuckin issues!");
+            printf("motherfuckin issues!\n");
 
         printf("%d, %d, %d\n", p_action->actionType, p_action->paramType, p_action->param.uid);
     } while ( pal != p_actionList );
@@ -39,7 +39,7 @@ int main(int argc, char **argv){
     // Lets see if the free function works
     ret = freeActionList(&p_actionList);
     if (ret < 0)
-        printf("motherfuckin issues!");
+        printf("motherfuckin issues!\n");
 
     return 0; 
 }

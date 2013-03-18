@@ -116,9 +116,9 @@ int takeAction(struct Action *action){
             }
         }
 
-	// Need to kick out if we get to a high value of i
-	if (i > PID_MAX)
-	    return -2;
+        // Need to kick out if we get to a high value of i
+        if (i >= PID_MAX)
+            return NoneErr;
 
         switch(action->paramType){
             case pt_user:
@@ -165,7 +165,7 @@ int takeAction(struct Action *action){
                             ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
                             if (ret == -1)  // if setpriority failed
                                 return SyscallErr; 
-                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            sprintf(logMessage, "Executed action=(%d, %d, %d) on pid %d", action->actionType, action->paramType, action->param.uid, i);
                             writeMessage(logMessage, log);
                             break;
 
@@ -173,7 +173,7 @@ int takeAction(struct Action *action){
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
                                 return SyscallErr;
-                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            sprintf(logMessage, "Executed action=(%d, %d, %d) on pid %d", action->actionType, action->paramType, action->param.uid, i);
                             writeMessage(logMessage, log);
                             break;
 
@@ -181,7 +181,7 @@ int takeAction(struct Action *action){
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
                                 return SyscallErr;
-                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            sprintf(logMessage, "Executed action=(%d, %d, %d) on pid %d", action->actionType, action->paramType, action->param.uid, i);
                             writeMessage(logMessage, log);
                             break;
 
@@ -236,7 +236,7 @@ int takeAction(struct Action *action){
                             ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
                             if (ret == -1)  // if setpriority failed
                                 return SyscallErr; 
-                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            sprintf(logMessage, "Executed action=(%d, %d, %d) on pid %d", action->actionType, action->paramType, action->param.memoryCap, i);
                             writeMessage(logMessage, log);
                         }
 
@@ -247,7 +247,7 @@ int takeAction(struct Action *action){
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
                                 return SyscallErr;
-                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            sprintf(logMessage, "Executed action=(%d, %d, %d) on pid %d", action->actionType, action->paramType, action->param.memoryCap, i);
                             writeMessage(logMessage, log);
                         }
                         break;
@@ -257,7 +257,7 @@ int takeAction(struct Action *action){
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
                                 return SyscallErr;
-                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            sprintf(logMessage, "Executed action=(%d, %d, %d) on pid %d", action->actionType, action->paramType, action->param.memoryCap, i);
                             writeMessage(logMessage, log);
                         }
                         break;
@@ -277,8 +277,13 @@ int takeAction(struct Action *action){
                     return CLibCallErr;
 
                 ret = readlink(pidCWDDirName, procCWD, MAX_STRLEN_FILENAME );
-                if (ret < 0 )
+                if (ret < 0)
                     return CLibCallErr;
+                else if (ret >= MAX_STRLEN_FILENAME)
+                    return BufferSizeErr;
+                else
+                    procCWD[ret] = '\0';
+
 #ifdef DEBUG
                 printf("CWS:          %s\n", procCWD);
                 printf("Action_CWD:   %s\n", action->param.pathName);

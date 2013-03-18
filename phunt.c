@@ -17,7 +17,7 @@ extern struct Log *log;
 Description: Macro for printing errors IN THE MAIN METHOD ONLY
 */
 #define printError(errorCode) do{               \
-    printf("Error: %s -- %s:%d\n    Message: %s", __FILE__, __func__, __LINE__, strError(errorCode));  \
+    printf("Error: %s -- %s:%d\n    Message: %s\n", __FILE__, __func__, __LINE__, strError(errorCode));  \
 }while(0)
 
 /*
