@@ -85,16 +85,6 @@ int takeAction(struct Action *action){
     char pidCWDDirName[MAX_STRLEN_FILENAME];
 
 
-    //We were going to take care of the user nice with setpriority() since setpriority handles that, but it would inhibit logging, so it needs to be done like the other cases.
-//  //We want to take care of the user nice case outside of the loop because we can do that with setpriority()
-    // if (action->paramType == pt_user && action->actionType == at_nice){       //nice all processes owned by a user
-        // ret = setpriority(PRIO_USER, action->param.uid, -20);   //nice all of user by uid (param)
-        // if (ret == -1)  // if setpriority failed
-            // return SyscallErr; 
-        // else 
-            // return 0;
-    // }
-
     // we actually initialize the value of i to 1 below
     i = 0;
     while(i < PID_MAX){        //until looked at every numbered directory not beginning with '0' in /proc 
@@ -164,18 +154,25 @@ int takeAction(struct Action *action){
                 // check if the procUid from the /proc/i/status file matches the action's param.uid
                 if(action->param.uid == procUid){
                     switch(action->actionType){
-                        // This should be taken care of before we iterate over proc, otherwise if we have a user nice case we would be setting the priority every time we look at any process
-                        // case at_nice:    //nice all processes owned by a user
+                        case at_nice:    //nice all processes owned by a user
+                            ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
+                            if (ret == -1)  // if setpriority failed
+                                return SyscallErr; 
+                            // XXX LOG
+                            break;
+
                         case at_kill:       //kill all processes owned by a user
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
                                 return SyscallErr;
+                            // XXX LOG
                             break;
 
                         case at_susp:       //suspend all processes owned by the user
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
                                 return SyscallErr;
+                            // XXX LOG
                             break;
 
                         default:
@@ -228,6 +225,7 @@ int takeAction(struct Action *action){
                             ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
                             if (ret == -1)  // if setpriority failed
                                 return SyscallErr; 
+                            // XXX LOG
                         }
 
                         break;
@@ -237,6 +235,7 @@ int takeAction(struct Action *action){
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
                                 return SyscallErr;
+                            // XXX LOG
                         }
                         break;
                     case at_susp:       //suspend all processes above a certain memory capacity
@@ -245,6 +244,7 @@ int takeAction(struct Action *action){
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
                                 return SyscallErr;
+                            // XXX LOG
                         }
                         break;
         
@@ -276,16 +276,19 @@ int takeAction(struct Action *action){
                             ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
                             if (ret == -1)  // if setpriority failed
                                 return SyscallErr; 
+                            // XXX LOG
                             break;
                         case at_kill:       //kill all processes in a particular current working directory
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
                                 return SyscallErr;
+                            // XXX LOG
                             break;
                         case at_susp:       //suspend all processes in a particular current working directory
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
                                 return SyscallErr;
+                            // XXX LOG
                             break;
             
                         default:
