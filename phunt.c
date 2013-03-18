@@ -127,6 +127,7 @@ int main(int argc, char **argv){
                 printError(ret);
                 exit(0);
             }
+            // XXX LOG Say what action is going to be taken care of
 
             ///// fulfil the next action
             ret = takeAction(action);
