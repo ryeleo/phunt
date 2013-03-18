@@ -83,6 +83,7 @@ int takeAction(struct Action *action){
     char line[MAX_STRLEN_LINE];
     char procCWD[MAX_STRLEN_FILENAME];
     char pidCWDDirName[MAX_STRLEN_FILENAME];
+    char logMessage[MAX_STRLEN_LOGMSG];                      // A buffer for composing messages to write to log
 
 
     // we actually initialize the value of i to 1 below
@@ -164,21 +165,24 @@ int takeAction(struct Action *action){
                             ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
                             if (ret == -1)  // if setpriority failed
                                 return SyscallErr; 
-                            // XXX LOG
+                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            writeMessage(logMessage, log);
                             break;
 
                         case at_kill:       //kill all processes owned by a user
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
                                 return SyscallErr;
-                            // XXX LOG
+                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            writeMessage(logMessage, log);
                             break;
 
                         case at_susp:       //suspend all processes owned by the user
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
                                 return SyscallErr;
-                            // XXX LOG
+                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            writeMessage(logMessage, log);
                             break;
 
                         default:
@@ -232,7 +236,8 @@ int takeAction(struct Action *action){
                             ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
                             if (ret == -1)  // if setpriority failed
                                 return SyscallErr; 
-                            // XXX LOG
+                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            writeMessage(logMessage, log);
                         }
 
                         break;
@@ -242,7 +247,8 @@ int takeAction(struct Action *action){
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
                                 return SyscallErr;
-                            // XXX LOG
+                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            writeMessage(logMessage, log);
                         }
                         break;
                     case at_susp:       //suspend all processes above a certain memory capacity
@@ -251,7 +257,8 @@ int takeAction(struct Action *action){
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
                                 return SyscallErr;
-                            // XXX LOG
+                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            writeMessage(logMessage, log);
                         }
                         break;
         
@@ -283,19 +290,22 @@ int takeAction(struct Action *action){
                             ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
                             if (ret == -1)  // if setpriority failed
                                 return SyscallErr; 
-                            // XXX LOG
+                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            writeMessage(logMessage, log);
                             break;
                         case at_kill:       //kill all processes in a particular current working directory
                             ret = kill(i, SIGKILL);
                             if(ret == -1)
                                 return SyscallErr;
-                            // XXX LOG
+                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            writeMessage(logMessage, log);
                             break;
                         case at_susp:       //suspend all processes in a particular current working directory
                             ret = kill(i, SIGSTOP);
                             if(ret == -1)
                                 return SyscallErr;
-                            // XXX LOG
+                            sprintf(logMessage, "Executed action=(%d, %d, %s) on pid %d", action->actionType, action->paramType, action->param.pathName, i);
+                            writeMessage(logMessage, log);
                             break;
             
                         default:

@@ -42,7 +42,8 @@ int main(int argc, char **argv){
     char
         logFileName[MAX_OPT_LEN] = "/var/log/phunt.log",    // Filename of log to append to while running this process
         configFileName[MAX_OPT_LEN] = "/etc/phunt.conf",    // Filename of configuration for running this process
-        *logPrefix = "phunt";
+        *logPrefix = "phunt",                               // The prefix which is printed with every log message, at most 32 bytes
+        logMessage[MAX_STRLEN_LOGMSG];                      // A buffer for composing messages to write to log
 
     struct Action *action;  // An action pointer used when interacting with the actionList
 
@@ -83,28 +84,49 @@ int main(int argc, char **argv){
     }
 
 
-    ///// Initialize log and actionList
-    // initialize the actionList
-    ret = initActionList(configFileName, &actionList);
-    if (ret < 0){
-        printError(ret);
-        exit(0);
+
+    ///// Daemonize if we are asked to
+    writeMessage("Running phunt as a daemon, forking now.", log);
+    if (isDaemon == 1){
+        ret = fork();
+        if (ret > 0){ // if we are the parent
+            exit(0); 
+        }
+        if (ret < 0){ // if there was an error
+            writeMessage("Error deamonizing phunt:", log);
+            writeMessage(strError(ret), log);
+            exit(0); 
+        }
     }
+
+
+
+    ///// Initialize log and actionList
     // initializt the log 
     ret = initLog(logFileName, logPrefix, log);
     if (ret < 0){
         printError(ret);
+        // writeMessage("Error initializing log", log);
+        // writeMessage(strError(ret), log);
+        exit(0);
+    }
+    sprintf(logMessage, "Initialized log, logging to file: %s", logFileName);
+    writeMessage(logMessage, log);
+
+    // initialize the actionList
+    sprintf(logMessage, "Initializing phunt via config file: %s", configFileName);
+    writeMessage(logMessage, log);
+    ret = initActionList(configFileName, &actionList);
+    if (ret < 0){
+        printError(ret);
+        writeMessage("Error initializing phunt:", log);
+        writeMessage(strError(ret), log);
         exit(0);
     }
 
-
-
-    ///// Daemonize if we are asked to
-    if (isDaemon == 1){
-        ret = fork();
-        if (ret != 0) // if there was an error or we are the parent
-            exit(0); 
-    }
+    // Print startup message
+    sprintf(logMessage, "Phunt initialized and executing (PID=%d)", getpid());
+    writeMessage(logMessage, log);
 
 
 
@@ -117,20 +139,32 @@ int main(int argc, char **argv){
             ret = getAction(&action, &actionList_iter);
             if (ret < 0){
                 printError(ret);
+                writeMessage("Error getting next action from actionList:", log);
+                writeMessage(strError(ret), log);
                 exit(0);
             }
             // Incrament our list to the next action
             ret = nextAction(&actionList_iter);
             if (ret < 0){
                 printError(ret);
+                writeMessage("Error iterating through actionList:", log);
+                writeMessage(strError(ret), log);
                 exit(0);
             }
-            // XXX LOG Say what action is going to be taken care of
 
             ///// fulfil the next action
+            if (action->paramType == pt_path)
+                sprintf(logMessage, "Executing action = (%d, %d, %s)", action->actionType, action->paramType, action->param.pathName);
+            else if (action->paramType == pt_user)
+                sprintf(logMessage, "Executing action = (%d, %d, %d)", action->actionType, action->paramType, action->param.uid);
+            else// if (action->paramType == pt_mem)
+                sprintf(logMessage, "Executing action = (%d, %d, %d)", action->actionType, action->paramType, action->param.memoryCap);
+            writeMessage(logMessage, log);
             ret = takeAction(action);
             if (ret < 0){
                 printError(ret);
+                writeMessage("Error executing action (takeAction):", log);
+                writeMessage(strError(ret), log);
                 exit(0);
             }
         } while ( actionList_iter != actionList );
@@ -143,14 +177,20 @@ int main(int argc, char **argv){
     ret = freeActionList(&actionList_iter);
     if (ret < 0){
         printError(ret);
+        writeMessage("Error freeing actionList:", log);
+        writeMessage(strError(ret), log);
     }
     // release open log resources
     ret = closeLog(log); 
     if (ret < 0){
         printError(ret);
+        writeMessage("Error closing log:", log);
+        writeMessage(strError(ret), log);
     }
 
     // DONE!!!
+    sprintf(logMessage, "Phunt has completed execution and will now halt (PID=%d)", getpid());
+    writeMessage(logMessage, log);
     exit(0);
 }//END main
 

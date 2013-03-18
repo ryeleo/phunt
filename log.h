@@ -7,7 +7,7 @@ YYYY/MM/DD HH:MM:SS <prefix>: <message>
 */
 #ifndef __LOG_H__
 #define __LOG_H__
-
+#define MAX_STRLEN_LOGMSG 1024
 #define MAX_STRLEN_TIME 32
 #define MAX_STRLEN_PREFIX 32      
 #define MAX_STRLEN_LOGMESSAGE 320 // Allows 255 bytes for log messages

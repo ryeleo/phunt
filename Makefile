@@ -18,7 +18,7 @@ test_action:
 	$(CC) test_action.c action.c util.c log.c $(CFLAGS) -g -DDEBUG -o $(PROJECTDIR)/test_action
 
 test_actionlist:
-	$(CC) test_actionlist.c actionlist.c util.c action.c $(CFLAGS) -g -DDEBUG -o $(PROJECTDIR)/test_actionlist
+	$(CC) test_actionlist.c actionlist.c action.c util.c log.c $(CFLAGS) -g -DDEBUG -o $(PROJECTDIR)/test_actionlist
 
 phunt: phunt.c
 	$(CC) phunt.c actionlist.c action.c util.c log.c $(CFLAGS) -o $(PROJECTDIR)/phunt
