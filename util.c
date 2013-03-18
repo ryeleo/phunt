@@ -37,10 +37,6 @@ int readLine(int fd, char *retLine, int retLineLength){
 
 // getUidFromUser returns the uid given a username
 int getUidFromUser(char *uname){
-    // #include <sys/types.h>
-    // #include <pwd.h>
-    // man 3 getpwnam
-    // struct passwd *getpwnam(const char *name);
     struct passwd *passwd;
     passwd = getpwnam(uname);
     if (passwd == NULL)
