@@ -36,9 +36,7 @@ parent process to the init process, etc...
 int main(int argc, char **argv){
 
     int 
-        i,              // general purpose iterator
         ret,            // general-purpose/error-checking return value
-        byteCount,      // used to hold the number of bytes when buffering writes/sends
         isDaemon = 0;   // flag to indicate that this program will execute as a daemon
 
     char

@@ -1,10 +1,12 @@
 CC			= gcc
 PROJECTDIR 	= .
 CFLAGS		= -Wall
-#LIBS		= 
 DEBUG		= -g -DDEBUG
 
 default: phunt
+
+debug: CFLAGS += $(DEBUG)
+debug: default
 
 test_util:
 	$(CC) test_util.c util.c $(CFLAGS) -g -DDEBUG -o $(PROJECTDIR)/test_util
@@ -17,9 +19,6 @@ test_action:
 
 test_actionlist:
 	$(CC) test_actionlist.c actionlist.c util.c action.c $(CFLAGS) -g -DDEBUG -o $(PROJECTDIR)/test_actionlist
-
-debug: CFLAGS += $(DEBUG)
-debug: test_action
 
 phunt: phunt.c
 	$(CC) phunt.c actionlist.c action.c util.c log.c $(CFLAGS) -o $(PROJECTDIR)/phunt

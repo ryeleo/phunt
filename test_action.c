@@ -21,7 +21,7 @@ int main(int argc, char **argv){
 
     printf("Testing initialization of actions...\n");
     // test initAction
-    initAction(at_nice, pt_mem,     "128", &nice_mem_action);
+    initAction(at_nice, pt_mem,     "4000", &nice_mem_action);
     initAction(at_nice, pt_user,    "ryan", &nice_usr_action);
     initAction(at_nice, pt_path,    "/tmp/testing", &nice_pth_action);
     initAction(at_kill, pt_mem,     "400", &kill_mem_action);

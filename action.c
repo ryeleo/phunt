@@ -115,6 +115,10 @@ int takeAction(struct Action *action){
             }
         }
 
+	// Need to kick out if we get to a high value of i
+	if (i > PID_MAX)
+	    return -2;
+
         switch(action->paramType){
             case pt_user:
 
@@ -133,7 +137,9 @@ int takeAction(struct Action *action){
                 // walk through the status file until we find the line that starts with "Uid:"
                 while(1){
                     ret = readLine(fd, line, MAX_STRLEN_LINE);
-                    if (ret < 0)
+                    if (ret == EndOfFileErr)
+                        break;
+                    else if (ret < 0)
                         return IOErr;
                     ret = sscanf( line , "Uid: %d %*d %*d %*d", &procUid);
                     if ( ret != 1 ) // This means that we did NOT find the line
@@ -199,7 +205,9 @@ int takeAction(struct Action *action){
                 // walk through the status file until we find the line that starts with "Uid:"
                 while(1){
                     ret = readLine(fd, line, MAX_STRLEN_LINE);
-                    if (ret < 0)
+                    if (ret == EndOfFileErr)
+                        break;
+                    else if (ret < 0)
                         return IOErr;
                     ret = sscanf(line, "VmRSS: %d kB", &procVmRSS);
                     if ( ret != 1 ) // This means that we did NOT find the line
@@ -221,7 +229,6 @@ int takeAction(struct Action *action){
                     case at_nice:       //nice all processes below a certain memory capacity
                         
                         if (procVmRSS <= action->param.memoryCap){
-
                             ret = setpriority(PRIO_PROCESS, i, -20);   //nice all of user by uid (parameter)
                             if (ret == -1)  // if setpriority failed
                                 return SyscallErr; 
