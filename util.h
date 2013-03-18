@@ -28,6 +28,10 @@ Return: Number of characters in line upon success,
 */
 int readLine(int fd, char *retLine, int retLineLength);
 
+/*
+*/
+int getUidFromUser(char *uname);
+
 
 /*
 Description: Takes an error code and returns a pointer to a const char * which

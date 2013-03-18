@@ -16,7 +16,7 @@
 #include <signal.h>
 
 // We must have a global log in order to takeAction().
-extern struct Log *log;
+struct Log *log;
 
 const char *actionStrings[3] = {
     "kill",
@@ -329,20 +329,4 @@ int freeAction(struct Action *action){
     if (action->paramType == pt_path)
         free(action->param.pathName);
     return 0; 
-}
-
-
-
-// getUidFromUser returns the uid given a username
-int getUidFromUser(char *uname){
-    // #include <sys/types.h>
-    // #include <pwd.h>
-    // man 3 getpwnam
-    // struct passwd *getpwnam(const char *name);
-    return 0;
-}
-
-// GetUIDFromProcess Returns the uid of the owner of the process
-int getUIDFromProcess(char *uname){
-    return 0;
 }
